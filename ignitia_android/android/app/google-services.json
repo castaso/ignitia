@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "239729405706",
+    "project_id": "bl-eb-app",
+    "storage_bucket": "bl-eb-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:239729405706:android:a0b6d1013ac2b059ca94f3",
+        "android_client_info": {
+          "package_name": "com.naas.i_employment"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "239729405706-8jm2lu806jluqi3gsu2bqndpuh5jn2ok.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD5Mupxr4rUmaDE5TLm_Nrz8W1Ri36M8Fk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "239729405706-8jm2lu806jluqi3gsu2bqndpuh5jn2ok.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "239729405706-8nujdk0rmtfl4car97j7uv6h9k4sg6q1.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "net.banglalink.ebApp"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

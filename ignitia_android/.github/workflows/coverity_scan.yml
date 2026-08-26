@@ -1,0 +1,50 @@
+name: Coverity Scan
+
+on:
+  push:
+    branches:
+      - main  # Runs only on the main branch (change if needed)
+
+jobs:
+  coverity_scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Install Flutter
+      - name: Install Flutter
+        run: |
+          git clone https://github.com/flutter/flutter.git --branch stable --depth 1
+          echo "$PWD/flutter/bin" >> $GITHUB_PATH  # Add Flutter to the PATH
+
+      - name: Verify Flutter installation
+        run: |
+          flutter doctor
+
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y wget tar curl unzip
+
+      - name: Download Coverity Tool
+        run: |
+          wget --post-data "token=${{ secrets.COVERITY_TOKEN }}&project=${{ github.repository }}" -O coverity_tool.tgz https://scan.coverity.com/download/linux64
+          tar -xzf coverity_tool.tgz
+
+      - name: Run Coverity Scan
+        run: |
+          flutter --version  # Verify flutter command works
+          ./cov-analysis*/bin/cov-build --dir cov-int flutter build apk  # Ensure this is the correct build command
+
+      - name: Compress scan results
+        run: tar czvf myproject.tgz cov-int
+
+      - name: Upload scan results to Coverity
+        run: |
+          curl --form token=${{ secrets.COVERITY_TOKEN }} \
+               --form email="jakir.cse24@gmail.com" \
+               --form file=@myproject.tgz \
+               --form version="${{ github.ref }}" \
+               --form description="Automated scan for commit ${{ github.sha }}" \
+               https://scan.coverity.com/builds?project=${{ github.repository }}
