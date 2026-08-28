@@ -339,6 +339,80 @@ def test_overtime_add_and_list(client, token):
     assert "employeE_ID" in row and "overtimE_MINUTES" in row
 
 
+def test_company_crud(client, token):
+    # list starts empty (or seeded) but returns the envelope
+    r = client.get("/api/Companies", headers=auth(token))
+    assert r.status_code == 200
+    body = r.json()
+    assert body["isSuccess"] is True
+    assert isinstance(body["data"], list)
+
+    # create
+    company = {
+        "id": 0,
+        "name": "Ignitia Ltd.",
+        "code": "IGN001",
+        "short_name": "Ignitia",
+        "address": "Office Area, Dhaka",
+        "phone": "01700000000",
+        "email": "info@ignitia.local",
+        "website": "https://ignitia.local",
+        "contact_person": "Admin",
+        "status_id": 1,
+    }
+    r = client.post("/api/Companies", json=company, headers=auth(token))
+    body = r.json()
+    assert body["isSuccess"] is True
+    created = body["data"]
+    assert created["name"] == "Ignitia Ltd."
+    assert created["code"] == "IGN001"
+    company_id = created["id"]
+
+    # duplicate code rejected
+    r = client.post("/api/Companies", json=company, headers=auth(token))
+    assert r.json()["isSuccess"] is False
+    assert "already in use" in r.json()["message"]
+
+    # create without a name rejected
+    r = client.post("/api/Companies", json={"name": "  "}, headers=auth(token))
+    assert r.json()["isSuccess"] is False
+
+    # get by id
+    r = client.get("/api/Companies", params={"id": company_id}, headers=auth(token))
+    assert r.json()["data"]["id"] == company_id
+
+    # list contains it
+    r = client.get("/api/Companies", headers=auth(token))
+    assert any(c["id"] == company_id for c in r.json()["data"])
+
+    # update
+    r = client.put(
+        "/api/Companies",
+        json={"id": company_id, "name": "Ignitia Solutions Ltd.", "phone": "01800000000"},
+        headers=auth(token),
+    )
+    body = r.json()
+    assert body["isSuccess"] is True
+    assert body["data"]["name"] == "Ignitia Solutions Ltd."
+    assert body["data"]["phone"] == "01800000000"
+
+    # update missing id -> not found
+    r = client.put("/api/Companies", json={"id": 9999, "name": "Ghost"}, headers=auth(token))
+    assert r.json()["isSuccess"] is False
+
+    # delete
+    r = client.delete("/api/Companies", params={"id": company_id}, headers=auth(token))
+    assert r.json()["isSuccess"] is True
+
+    # delete missing id -> not found
+    r = client.delete("/api/Companies", params={"id": company_id}, headers=auth(token))
+    assert r.json()["isSuccess"] is False
+
+    # list is empty again
+    r = client.get("/api/Companies", headers=auth(token))
+    assert all(c["id"] != company_id for c in r.json()["data"])
+
+
 def test_payslip_generation(client, token):
     r = client.get("/api/Payroll/GetPayslip", params={"employee_id": 1, "salary_year": 2026,
                                                      "salary_month": 8}, headers=auth(token))

@@ -78,6 +78,8 @@ Matching `lib/repo/api_service.dart`:
   `DELETE /Attendance/deleteAttendanceRequest`, `POST /Attendance/approveAttendance`
 - **Employees**: `GET /Employees`, `GET /Employees/profile`, `GET /Employees/GetContactInfo`,
   `PUT /Employees`, plus server-only `PUT /Employees/referenceFace`
+- **Companies** (maintain companies): `GET /Companies`, `POST /Companies`, `PUT /Companies`,
+  `DELETE /Companies`
 - **Leave**: `GET /Leave/getEmployeeLeaveSummary`, `GET /Leave/getLeaveList`,
   `GET /Leave`, `POST /Leave`, `PUT /Leave`, `PUT /Leave/approveEmployeeLeave`, `DELETE /Leave`
 - **Overtime**: `GET /Overtime`, `POST /Overtime`, `PUT /Overtime`,

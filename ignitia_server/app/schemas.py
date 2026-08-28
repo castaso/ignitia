@@ -119,6 +119,27 @@ class ProfileIn(BaseModel):
     model_config = ConfigDict(extra="ignore")
 
 
+class CompanyIn(BaseModel):
+    """Body of POST / PUT /api/Companies.
+
+    The client may serialise the full CompanyModel (toJson), so unknown
+    fields are tolerated.
+    """
+
+    id: int = 0
+    name: Optional[str] = None
+    code: Optional[str] = None
+    short_name: Optional[str] = None
+    address: Optional[str] = None
+    phone: Optional[str] = None
+    email: Optional[str] = None
+    website: Optional[str] = None
+    contact_person: Optional[str] = None
+    status_id: Optional[int] = None
+
+    model_config = ConfigDict(extra="ignore")
+
+
 # --- responses ----------------------------------------------------------
 
 
@@ -145,6 +166,22 @@ def employee_json(emp) -> dict:
         "status_id": emp.status_id,
         "joining_date": emp.joining_date.isoformat() if emp.joining_date else None,
         "permanent_date": emp.permanent_date.isoformat() if emp.permanent_date else None,
+    }
+
+
+def company_json(company) -> dict:
+    return {
+        "id": company.id,
+        "name": company.name,
+        "code": company.code,
+        "short_name": company.short_name,
+        "address": company.address,
+        "phone": company.phone,
+        "email": company.email,
+        "website": company.website,
+        "contact_person": company.contact_person,
+        "status_id": company.status_id,
+        "created_at": company.created_at.isoformat() if company.created_at else None,
     }
 
 

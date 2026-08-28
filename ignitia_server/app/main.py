@@ -11,7 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from .config import settings
 from .database import Base, engine
-from .routers import attendance, employees, leave, login, overtime, payroll
+from .routers import attendance, companies, employees, leave, login, overtime, payroll
 
 
 @asynccontextmanager
@@ -59,6 +59,7 @@ def create_app() -> FastAPI:
         leave.router,
         overtime.router,
         payroll.router,
+        companies.router,
     ):
         app.include_router(router, prefix="/api")
 

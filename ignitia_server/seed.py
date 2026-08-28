@@ -12,7 +12,7 @@ from datetime import datetime
 from PIL import Image, ImageDraw
 
 from app.database import Base, SessionLocal, engine
-from app.models import Employee, LeaveType
+from app.models import Company, Employee, LeaveType
 from app.security import hash_password
 
 
@@ -72,6 +72,21 @@ def main() -> None:
         admin.password_hash = hash_password("admin1234")
         admin.reference_face = make_demo_face("admin-reference")
         db.add(admin)
+
+    if db.query(Company).count() == 0:
+        db.add(
+            Company(
+                name="Ignitia Ltd.",
+                code="IGN001",
+                short_name="Ignitia",
+                address="Office Area, Dhaka",
+                phone="01700000000",
+                email="info@ignitia.local",
+                website="https://ignitia.local",
+                contact_person="Admin",
+                status_id=1,
+            )
+        )
 
     if db.query(LeaveType).count() == 0:
         for name, short, count in (

@@ -16,6 +16,22 @@ from sqlalchemy import (
 from .database import Base
 
 
+class Company(Base):
+    __tablename__ = "companies"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(200), index=True)
+    code = Column(String(50), unique=True, index=True, nullable=True)
+    short_name = Column(String(100), nullable=True)
+    address = Column(String(500), nullable=True)
+    phone = Column(String(50), nullable=True)
+    email = Column(String(200), nullable=True)
+    website = Column(String(200), nullable=True)
+    contact_person = Column(String(200), nullable=True)
+    status_id = Column(Integer, default=1)  # 1 = active
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+
 class Employee(Base):
     __tablename__ = "employees"
 
