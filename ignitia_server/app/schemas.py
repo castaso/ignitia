@@ -151,8 +151,11 @@ def fail(message: str, data: Any = None) -> dict:
     return {"isSuccess": False, "message": message, "data": data}
 
 
-def employee_json(emp) -> dict:
-    return {
+def employee_json(emp, *, dept_name: str | None = None,
+                  ptkp_code: str | None = None,
+                  ptkp_annual_value: float | None = None,
+                  last_transfer: dict | None = None) -> dict:
+    d = {
         "id": emp.id,
         "name": emp.name,
         "designation": emp.designation or "",
@@ -164,9 +167,20 @@ def employee_json(emp) -> dict:
         "employee_id": emp.employee_id,
         "supervisor_id": emp.supervisor_id,
         "status_id": emp.status_id,
+        "department_id": getattr(emp, "department_id", None),
+        "ptkp_status_id": getattr(emp, "ptkp_status_id", None),
         "joining_date": emp.joining_date.isoformat() if emp.joining_date else None,
         "permanent_date": emp.permanent_date.isoformat() if emp.permanent_date else None,
+        "basic_salary": getattr(emp, "basic_salary", 0.0),
     }
+    if dept_name is not None:
+        d["department_name"] = dept_name
+    if ptkp_code is not None:
+        d["ptkp_status_code"] = ptkp_code
+        d["ptkp_annual_value"] = ptkp_annual_value
+    if last_transfer is not None:
+        d.update(last_transfer)
+    return d
 
 
 def company_json(company) -> dict:

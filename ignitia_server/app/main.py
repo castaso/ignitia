@@ -10,15 +10,36 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .config import settings
-from .database import Base, engine
-from .routers import attendance, companies, employees, leave, login, overtime, payroll
+from .database import Base, SessionLocal, engine
+from .migrations import run_migrations
+from .routers import (
+    attendance,
+    companies,
+    departments,
+    employees,
+    leave,
+    login,
+    manpower_plans,
+    overtime,
+    payroll,
+    ptkp_statuses,
+    replacement_tracking,
+)
+from .seed import seed_ptkp_statuses
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Create tables on first run. Use a migration tool (e.g. Alembic)
-    # once the schema stabilises.
+    # 1. Create any missing tables.
     Base.metadata.create_all(bind=engine)
+    # 2. Add new columns to existing tables (idempotent).
+    run_migrations(engine)
+    # 3. Seed reference data.
+    db = SessionLocal()
+    try:
+        seed_ptkp_statuses(db)
+    finally:
+        db.close()
     yield
 
 
@@ -27,7 +48,7 @@ def create_app() -> FastAPI:
         title="ignitia_server",
         description="Backend for the i_employment Flutter app, with "
         "server-side geo-fence + face verification to prevent proxy attendance.",
-        version="0.1.0",
+        version="0.2.0",
         lifespan=lifespan,
     )
 
@@ -60,6 +81,10 @@ def create_app() -> FastAPI:
         overtime.router,
         payroll.router,
         companies.router,
+        departments.router,
+        ptkp_statuses.router,
+        manpower_plans.router,
+        replacement_tracking.router,
     ):
         app.include_router(router, prefix="/api")
 

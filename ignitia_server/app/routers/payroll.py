@@ -6,6 +6,14 @@ Wire contract (Flutter client):
 
 The payslip is derived from the employee record and that month's attendance
 (see lib/models/payroll/salary_model.dart for the exact JSON keys).
+
+PPh 21 calculation (UU HPP 2022 progressive tax brackets):
+  PKP = max(0, annual_gross - ptkp_annual)
+  Layer 1: PKP ≤  60_000_000 →  5%
+  Layer 2: PKP ≤ 250_000_000 → 15%  (on the slice above layer 1)
+  Layer 3: PKP ≤ 500_000_000 → 25%
+  Layer 4: PKP >  500_000_000 → 30%
+  AIT_monthly = annual_tax / 12
 """
 
 import calendar
@@ -16,11 +24,64 @@ from sqlalchemy.orm import Session
 
 from ..database import get_db
 from ..deps import get_current_employee
-from ..models import Attendance, Employee, UserLeave
+from ..models import Attendance, Employee, PtkpStatus, UserLeave
 from ..schemas import fail, ok
 
 router = APIRouter()
 
+# ---------------------------------------------------------------------------
+# PPh 21 progressive tax constants (UU HPP 2022)
+# ---------------------------------------------------------------------------
+
+_TAX_BRACKET_1 = 60_000_000.0    # 5%
+_TAX_BRACKET_2 = 250_000_000.0   # 15%
+_TAX_BRACKET_3 = 500_000_000.0   # 25%
+# above 500 jt → 30%
+
+_RATE_1 = 0.05
+_RATE_2 = 0.15
+_RATE_3 = 0.25
+_RATE_4 = 0.30
+
+# Default PTKP (TK/0) used when the employee has no PTKP status set.
+_DEFAULT_PTKP = 54_000_000.0
+
+
+def calculate_annual_pph21(pkp_annual: float) -> float:
+    """Compute annual PPh 21 for the given PKP (Penghasilan Kena Pajak)."""
+    if pkp_annual <= 0:
+        return 0.0
+    tax = 0.0
+    # Layer 1
+    l1 = min(pkp_annual, _TAX_BRACKET_1)
+    tax += l1 * _RATE_1
+    if pkp_annual <= _TAX_BRACKET_1:
+        return tax
+    # Layer 2
+    l2 = min(pkp_annual - _TAX_BRACKET_1, _TAX_BRACKET_2 - _TAX_BRACKET_1)
+    tax += l2 * _RATE_2
+    if pkp_annual <= _TAX_BRACKET_2:
+        return tax
+    # Layer 3
+    l3 = min(pkp_annual - _TAX_BRACKET_2, _TAX_BRACKET_3 - _TAX_BRACKET_2)
+    tax += l3 * _RATE_3
+    if pkp_annual <= _TAX_BRACKET_3:
+        return tax
+    # Layer 4
+    l4 = pkp_annual - _TAX_BRACKET_3
+    tax += l4 * _RATE_4
+    return tax
+
+
+def calculate_ait_monthly(gross_monthly: float, ptkp_annual: float) -> float:
+    """Monthly AIT (PPh 21) for the given monthly gross and annual PTKP."""
+    annual_gross = gross_monthly * 12
+    pkp = max(0.0, annual_gross - ptkp_annual)
+    annual_tax = calculate_annual_pph21(pkp)
+    return annual_tax / 12
+
+
+# ---------------------------------------------------------------------------
 
 def _is_weekend(day: date) -> bool:
     return day.weekday() in (5, 6)
@@ -36,7 +97,7 @@ def get_payslip(
 ):
     employee = db.get(Employee, employee_id or auth.id)
     if employee is None:
-        return fail("Employee not found")
+        return fail("Karyawan tidak ditemukan")
 
     days_of_month = calendar.monthrange(salary_year, salary_month)[1]
     month_key = f"{salary_year:04d}-{salary_month:02d}"
@@ -96,11 +157,16 @@ def get_payslip(
     absent_deduction = round(
         absent_days * (basic / days_of_month) if days_of_month else 0.0, 2
     )
-    # AIT is calculated on gross salary (simplified model: tax on gross, not taxable net).
-    ait = round(gross * 0.10, 2)
-    net_pay = round(
-        gross + ot_amount - absent_deduction - ait, 2
-    )
+
+    # --- PPh 21 progressive tax (replaces flat 10%) ---
+    ptkp_annual = _DEFAULT_PTKP
+    if employee.ptkp_status_id:
+        ptkp_row = db.get(PtkpStatus, employee.ptkp_status_id)
+        if ptkp_row:
+            ptkp_annual = ptkp_row.annual_value
+
+    ait = round(calculate_ait_monthly(gross, ptkp_annual), 2)
+    net_pay = round(max(0.0, gross + ot_amount - absent_deduction - ait), 2)
 
     data = {
         "employee_id": employee.employee_id,

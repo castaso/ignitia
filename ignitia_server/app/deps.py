@@ -23,3 +23,10 @@ def get_current_employee(
     if employee is None or employee.status_id != 1:
         raise HTTPException(status_code=401, detail="Unauthorized")
     return employee
+
+
+def require_admin(auth: Employee = Depends(get_current_employee)) -> Employee:
+    """Require the caller to be an admin (type_id == 1). Raises 403 otherwise."""
+    if auth.type_id != 1:
+        raise HTTPException(status_code=403, detail="Forbidden")
+    return auth
