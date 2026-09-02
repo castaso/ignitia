@@ -21,6 +21,7 @@ os.environ["FACE_SIMILARITY_THRESHOLD"] = "0.72"
 import pytest
 from PIL import Image, ImageDraw
 from fastapi.testclient import TestClient
+from datetime import datetime
 
 from app.database import Base, SessionLocal, engine
 from app.main import app
@@ -57,6 +58,7 @@ def _db():
             type_id=2,
             status_id=1,
             basic_salary=30000.0,
+            joining_date=datetime(2024, 1, 1),
         )
         demo.password_hash = hash_password("demo1234")
         demo.reference_face = make_face()
@@ -68,6 +70,7 @@ def _db():
             email="admin@ignitia.local",
             type_id=1,
             status_id=1,
+            joining_date=datetime(2024, 1, 1),
         )
         admin.password_hash = hash_password("admin1234")
         admin.reference_face = make_face()

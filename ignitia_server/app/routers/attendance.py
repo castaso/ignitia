@@ -291,14 +291,14 @@ def user_attendance_summary(
                 late_days += 1
         overtime_duration += r.overtimE_MINUTES or 0
 
-    leave_days = (
-        db.query(UserLeave)
-        .filter(
-            UserLeave.employee_id == employee_id,
-            UserLeave.is_approved == 1,
-        )
-        .count()
+    leave_query = db.query(UserLeave).filter(
+        UserLeave.employee_id == employee_id,
+        UserLeave.is_approved == 1,
     )
+    if start:
+        leave_query = leave_query.filter(UserLeave.start_date >= start)
+    leave_query = leave_query.filter(UserLeave.end_date <= end)
+    leave_days = leave_query.count()
 
     data = {
         "total_days": total_days,

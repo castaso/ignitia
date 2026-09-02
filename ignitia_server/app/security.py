@@ -15,13 +15,14 @@ face region. Featureless (blank / solid-colour) submissions are rejected.
 
 import base64
 import binascii
+import functools
 import hashlib
 import hmac
 import io
 import os
 import secrets
 import time
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from math import asin, cos, radians, sin, sqrt
 
 import jwt
@@ -64,8 +65,8 @@ def verify_password(password: str, stored: str) -> bool:
 def create_token(employee_id: int) -> str:
     payload = {
         "sub": str(employee_id),
-        "exp": datetime.utcnow() + timedelta(hours=settings.JWT_EXPIRE_HOURS),
-        "iat": datetime.utcnow(),
+        "exp": datetime.now(timezone.utc).replace(tzinfo=None) + timedelta(hours=settings.JWT_EXPIRE_HOURS),
+        "iat": datetime.now(timezone.utc).replace(tzinfo=None),
     }
     return jwt.encode(payload, settings.JWT_SECRET, algorithm=settings.JWT_ALGORITHM)
 
@@ -187,6 +188,7 @@ except Exception:
     cv2 = None
 
 
+@functools.lru_cache(maxsize=1)
 def _yunet_detector():
     """Lazily build the YuNet face detector (returns None when unavailable)."""
     if cv2 is None:
@@ -201,6 +203,7 @@ def _yunet_detector():
         return None
 
 
+@functools.lru_cache(maxsize=1)
 def _sface_recognizer():
     """Lazily build the SFace embedding recognizer (None when unavailable)."""
     if cv2 is None:
@@ -386,7 +389,6 @@ def issue_liveness_challenge() -> str:
     challenge_id = secrets.token_urlsafe(24)
     _challenges[challenge_id] = {
         "expires_at": now + settings.LIVENESS_CHALLENGE_TTL_SECONDS,
-        "used": False,
     }
     return challenge_id
 
@@ -397,7 +399,7 @@ def consume_liveness_challenge(challenge_id: str | None) -> bool:
     if not challenge_id:
         return False
     entry = _challenges.pop(challenge_id, None)
-    if entry is None or entry["used"]:
+    if entry is None:
         return False
     return entry["expires_at"] >= time.time()
 

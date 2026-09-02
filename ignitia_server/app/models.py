@@ -2,7 +2,7 @@
 Flutter client (note the odd casing of missinG_REASON / overtimE_MINUTES /
 employeE_ID / overtimE_DATE / checK_IN / checK_OUT / supervisoR_ID)."""
 
-from datetime import datetime
+from datetime import datetime, timezone
 
 from sqlalchemy import (
     Column,
@@ -114,7 +114,7 @@ class AttendanceEditRequest(Base):
     approval_status = Column(String(50), default="Pending")
     rejection_reason = Column(String(1000), nullable=True)
     approved_by = Column(Integer, nullable=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
 
 
 class Overtime(Base):
@@ -164,4 +164,4 @@ class PasswordResetToken(Base):
     token_hash = Column(String(200), unique=True)
     expires_at = Column(DateTime)
     used = Column(Integer, default=0)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))

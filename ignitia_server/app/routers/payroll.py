@@ -88,13 +88,15 @@ def get_payslip(
     conveyance = round(basic * 0.05, 2)
     gross = round(basic + medical + conveyance, 2)
 
-    hourly_rate = basic / 240 if days_of_month else 0.0
+    working_hours = (days_of_month - holidays) * 8
+    hourly_rate = basic / working_hours if working_hours else 0.0
     ot_amount = round((total_ot_minutes / 60) * hourly_rate, 2)
     overtime = round(total_ot_minutes / 60, 2)
 
     absent_deduction = round(
         absent_days * (basic / days_of_month) if days_of_month else 0.0, 2
     )
+    # AIT is calculated on gross salary (simplified model: tax on gross, not taxable net).
     ait = round(gross * 0.10, 2)
     net_pay = round(
         gross + ot_amount - absent_deduction - ait, 2

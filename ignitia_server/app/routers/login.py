@@ -16,7 +16,7 @@ inside `message`. Failed logins return HTTP 401 (the client maps this to an
 """
 
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from fastapi import APIRouter, Depends, Query
 from fastapi.responses import JSONResponse
@@ -99,7 +99,7 @@ def forget_password(db: Session = Depends(get_db), email: str = Query("")):
         PasswordResetToken(
             email=email,
             token_hash=hash_reset_token(token),
-            expires_at=datetime.utcnow()
+            expires_at=datetime.now(timezone.utc).replace(tzinfo=None)
             + timedelta(minutes=settings.RESET_TOKEN_TTL_MINUTES),
             used=0,
         )
@@ -136,7 +136,7 @@ def reset_password(payload: ResetPasswordRequest, db: Session = Depends(get_db))
         .order_by(PasswordResetToken.created_at.desc())
         .first()
     )
-    if record is None or record.expires_at < datetime.utcnow():
+    if record is None or record.expires_at < datetime.now(timezone.utc).replace(tzinfo=None):
         return fail("Invalid or expired reset link")
 
     record.used = 1
