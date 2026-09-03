@@ -11,6 +11,11 @@ import 'package:i_employment/views/employee/employee_list_page.dart';
 import 'package:i_employment/views/leave/leave_page.dart';
 import 'package:i_employment/views/overtime/overtime_list_page.dart';
 import 'package:i_employment/views/payroll/payslip_page.dart';
+import 'package:i_employment/views/settings/company_profile_settings_page.dart';
+import 'package:i_employment/views/settings/integration_settings_page.dart';
+import 'package:i_employment/views/settings/payroll_settings_page.dart';
+import 'package:i_employment/views/settings/time_attendance_settings_page.dart';
+import 'package:i_employment/views/settings/user_role_settings_page.dart';
 import 'package:i_employment/views/settings_page.dart';
 
 import '../models/menu_item_model.dart';
@@ -54,12 +59,20 @@ class MenuList{
     MenuItemModel(15, Strings.titleEmployeeListPage,[2], EmployeeListPage()),
     MenuItemModel(16, Strings.titleChangePasswordPage,[1,2], ChangePasswordPage()),
     MenuItemModel(17, Strings.titleWebPage,[1,2], WebViewPage(targetURL: FieldValue.webAppAddress)),
+    MenuItemModel(90, Strings.titleSettingsHub, [1], null, isParent: true, children: [
+      MenuItemModel(91, Strings.titleCompanySettingsPage, [1], const CompanyProfileSettingsPage()),
+      MenuItemModel(92, Strings.titleTimeAttendanceSettingsPage, [1], const TimeAttendanceSettingsPage()),
+      MenuItemModel(93, Strings.titlePayrollSettingsPage, [1], const PayrollSettingsPage()),
+      MenuItemModel(94, Strings.titleUserRoleSettingsPage, [1], const UserRoleSettingsPage()),
+      MenuItemModel(95, Strings.titleIntegrationSettingsPage, [1], const IntegrationSettingsPage()),
+    ]),
     MenuItemModel(98, Strings.titleSettingPage,[1,2], null),
     MenuItemModel(99, Strings.titleSignOut,[1,2], null),
 
   ];
 
   List<MenuItemModel> getMenuList(){
+    // Legacy 98 kept but hidden on web; new Settings hub 90 is admin-only [1] and visible on web
     if(kIsWeb) _menuList.removeWhere((element) => element.id==98);
     return _menuList;
   }

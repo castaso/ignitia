@@ -300,4 +300,24 @@ class Strings{
   static const colHeaderActivityUser = "User";
   static const colHeaderAnnouncementTitle = "Title";
   static const colHeaderFileName = "File Name";
+
+  // Settings Hub — Pengaturan (Bilingual, admin-only)
+  static const titleSettingsHub = "Settings / Pengaturan";
+  static const titleCompanySettingsPage = "Company Profile / Profil Perusahaan";
+  static const titleTimeAttendanceSettingsPage = "Time & Attendance / Waktu & Kehadiran";
+  static const titlePayrollSettingsPage = "Payroll / Penggajian";
+  static const titleUserRoleSettingsPage = "Users & Roles / Pengguna & Peran";
+  static const titleIntegrationSettingsPage = "Integrations / Integrasi";
+  static const textCompanyLegalName = "Legal Name";
+  static const textCompanyCode = "Company Code";
+  static const textCompanyContact = "Contact Person";
+  static const textAttendancePolicy = "Attendance Policy / Kebijakan Kehadiran";
+  static const textPayrollPolicy = "Payroll Policy / Kebijakan Penggajian";
+  static const textUserRolePolicy = "Users & Roles / Pengguna & Peran";
+  static const textIntegrationWebhook = "Webhook URL";
+  static const textIntegrationApiKey = "API Key";
+  static const hintCompanyName = "Enter company name";
+  static const hintWebhookUrl = "https://...";
+  static const colHeaderIntegrationName = "Integration";
+  static const colHeaderIntegrationStatus = "Status";
 }

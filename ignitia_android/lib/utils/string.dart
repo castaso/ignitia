@@ -224,4 +224,12 @@ class Strings{
   static const titleNotificationPage = "Notifications / Notifikasi";
   static const titleFilePage = "Files / Berkas";
   static const titleReportBuilderPage = "Report Builder";
+
+  // Settings Hub — Pengaturan (Bilingual, admin-only)
+  static const titleSettingsHub = "Settings / Pengaturan";
+  static const titleCompanySettingsPage = "Company Profile / Profil Perusahaan";
+  static const titleTimeAttendanceSettingsPage = "Time & Attendance / Waktu & Kehadiran";
+  static const titlePayrollSettingsPage = "Payroll / Penggajian";
+  static const titleUserRoleSettingsPage = "Users & Roles / Pengguna & Peran";
+  static const titleIntegrationSettingsPage = "Integrations / Integrasi";
 }

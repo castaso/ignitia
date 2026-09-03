@@ -85,14 +85,35 @@
 | 2026-09-03 | Plan mode blocks write | 1 | Serve draft inline, write after build mode |
 | 2026-09-03 | Shift table missing in models.py | 1 | Re-add Shift + 6 tables |
 
+### Phase 8: Settings Hub Tweak (Pengaturan) — 5 submenu admin-only MVP
+- **Status:** complete
+- **Started:** 2026-09-03
+- **Completed:** 2026-09-03
+- **Actions taken:**
+  - Restore planning-with-files: read task_plan/findings/progress + git diff clean + codegraph audit menu/string/settings
+  - Klarifikasi 5 poin final → 5 submenu admin-only, MVP stub, parent 90, paralel — approved
+  - Dashboard: `string.dart:277` +6 keys bilingual, `menu_list.dart:45` parent 90 [1] +5 children 91-95, `views/settings/` 5 polished pages (company_profile, time_attendance, payroll, user_role, integration) CustomAppBar+MenuPage+_ApiHint
+  - Android: `string.dart:51` mirror, `menu_list.dart:57` parent 90 ganti flat 98, `menu_page.dart:34` port ExpansionTile `_parentItem/_childItem`, `views/settings/` 5 pages
+  - Verify: pytest 68 passed, models import ok, 10 files changed
+- **Files created:** `ignitia_dashboard/lib/views/settings/*.dart` (5), `ignitia_android/lib/views/settings/*.dart` (5)
+- **Files modified:** `ignitia_dashboard/lib/utils/string.dart`, `menu_list.dart`, `ignitia_android/lib/utils/string.dart`, `menu_list.dart`, `views/menu_page.dart`, `task_plan.md`, `findings.md`, `progress.md`
+
+## Test Results
+| Test | Input | Expected | Actual | Status |
+|------|-------|----------|--------|--------|
+| pytest ignitia_server | 68 tests | all pass | 68 passed 2.73s | ✅ |
+| models import | CompanyAsset etc | ok | ok | ✅ |
+| Dashboard Settings | parent 90 +5 children [1] | admin-only | menu_list 91-95 | ✅ |
+| Android Settings | parent 90 port ExpansionTile | admin-only | menu_page + _childItem | ✅ |
+
 ## 5-Question Reboot Check
 | Question | Answer |
 |----------|--------|
-| Where am I? | Phase 7 in_progress |
-| Where am I going? | Verify → Delivery |
-| What's the goal? | Company Hub: aset semua, activity reuse AuditLog, in-app notif, files private, CSV report ✅ |
-| What have I learned? | Time Mgmt done + Company Hub 68 green + fan-out ok |
-| What have I done? | Phases 1-6 done, Phase 7 impl done |
+| Where am I? | Phase 8 complete |
+| Where am I going? | Push + optional dart analyze |
+| What's the goal? | Menu Settings kelompokkan akun perusahaan/waktu/penggajian/pengguna/integrasi — admin [1] `menu_list.dart:45` parent 90 — MVP stub ✅ |
+| What have I learned? | Dashboard reuse, Android flat → ExpansionTile, MVP _ApiHint cukup tanpa migrasi |
+| What have I done? | Phases 1-8 done, 5+5 Settings pages created, 68 green |
 
 ---
 *Update this file after completing a phase, running validation, or encountering an error.*

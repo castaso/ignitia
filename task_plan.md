@@ -4,10 +4,10 @@
 Membangun (1) Time Management / Manajemen Waktu (roster mingguan, kehadiran, istirahat 1-tipe, cuti, timesheet + liveness per-company bilingual) + (2) **Company / Perusahaan Hub** untuk administrasi: Aset (semua kategori/status), Activity History (reuse AuditLog), Announcements → in-app Notifications, Files private per-uploader (admin monitor), Report Builder CSV Timesheet only.
 
 ## Next Step
-Done — Phases 1-7 complete. Next: flutter build_runner for api_service.g.dart if needed.
+Phase 8 complete — verify 68 pass, 5 Settings pages polish. Next: optional `dart analyze` when toolchain available + push
 
 ## Current Phase
-Phase 7: Company Administration Hub (complete)
+Phase 8: Settings Hub Tweak (complete)
 
 ## Phases
 
@@ -55,6 +55,16 @@ Phase 7: Company Administration Hub (complete)
 - [x] Verify: pytest 68 pass, create_all 4 tables, manual QA green, pushed `3fbc757` → origin/main
 - **Status:** complete
 
+### Phase 8: Settings Hub Tweak (Pengaturan) — 5 submenu admin-only MVP
+- [x] Klarifikasi final 2026-09-03: 5 submenu (Company Profile, Waktu & Kehadiran, Penggajian, Pengguna & Peran, Integrasi), hanya admin [1], MVP stub _ApiHint seperti Company Hub, Android parent 90 ganti flat 98, paralel
+- [x] `ignitia_dashboard/lib/utils/string.dart:277` + keys `titleSettingsHub` + 5 `title*SettingsPage` bilingual + `text*`/`hint*`
+- [x] `ignitia_dashboard/lib/utils/menu_list.dart:45` parent 90 `[1]` +5 children 91-95 `const XxxSettingsPage()` + imports `views/settings/*.dart`
+- [x] `ignitia_dashboard/lib/views/settings/` 5 polished pages (CustomAppBar + MenuPage sidebar + _ApiHint) — company_profile, time_attendance (5 cards), payroll (PTKP), user_role, integration (SMTP/webhook)
+- [x] `ignitia_android/lib/utils/string.dart:51` mirror 5 keys + `ignitia_android/lib/utils/menu_list.dart:57` parent 90 ganti flat 98 + `ignitia_android/lib/views/menu_page.dart:34` ExpansionTile branch `_parentItem/_childItem`
+- [x] `ignitia_android/lib/views/settings/` 5 sub-page (keep legacy `settings_page.dart:17`)
+- [x] Verify: pytest 68 pass (2.73s), models import ok, dart analyze N/A, menu filter admin-only, ExpansionTile nav ok
+- **Status:** complete
+
 ## Key Questions
 1. Durasi istirahat default 60m window 12:00-13:00 OK? → **Resolved: OK, configurable per company via CompanyBreakConfig.**
 2. Export Timesheet format wajib xlsx + pdf? → **Resolved: CSV dulu (MVP), xlsx/pdf next.**
@@ -65,6 +75,11 @@ Phase 7: Company Administration Hub (complete)
 7. Announcements → email/push? → **Resolved: in-app notif saja (Q3).**
 8. Files private per-uploader? → **Resolved: private per-uploader, admin monitor all (Q4).**
 9. Report Builder scope? → **Resolved: CSV Timesheet export saja (Q5).**
+10. Settings submenu 5 atau 6? → **Resolved: 5 (Company Profile, Waktu & Kehadiran, Penggajian, Pengguna & Peran, Integrasi) — tanpa Sistem.**
+11. Settings akses role? → **Resolved: hanya admin [1].**
+12. Settings persist server? → **Resolved: MVP stub _ApiHint, tanpa tabel baru.**
+13. Android Settings flat 98? → **Resolved: ganti parent 90.**
+14. Eksekusi paralel? → **Resolved: paralel Dashboard+Android.**
 
 ## Decisions Made
 | Decision | Rationale |
@@ -79,6 +94,7 @@ Phase 7: Company Administration Hub (complete)
 | Company hub parent 40 all admin data | Q1 Company: aset semua kategori/status, activity reuse AuditLog, in-app notif, files private, CSV report |
 | Files private per-uploader admin monitor | Q4 Company: `CompanyFile.uploader_id` + admin override `?all=true` + require_admin |
 | Activity reuse AuditLog | Q2 Company: tidak noisy view-tracking, cukup audit existing |
+| Settings parent 90 5 children admin-only MVP | Kelompokkan akun perusahaan/waktu/penggajian/pengguna/integrasi, admin [1], stub _ApiHint tanpa migrasi |
 
 ## Errors Encountered
 | Error | Attempt | Resolution |

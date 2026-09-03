@@ -9,6 +9,11 @@ import 'package:ignitia_dashboard/views/company_admin/notification/notification_
 import 'package:ignitia_dashboard/views/company_admin/report/report_builder_page.dart';
 import 'package:ignitia_dashboard/views/dashboard_home_screen.dart';
 import 'package:ignitia_dashboard/views/employee/employee_list_page.dart';
+import 'package:ignitia_dashboard/views/settings/company_profile_settings_page.dart';
+import 'package:ignitia_dashboard/views/settings/integration_settings_page.dart';
+import 'package:ignitia_dashboard/views/settings/payroll_settings_page.dart';
+import 'package:ignitia_dashboard/views/settings/time_attendance_settings_page.dart';
+import 'package:ignitia_dashboard/views/settings/user_role_settings_page.dart';
 import 'package:ignitia_dashboard/views/shift/assign_shift_page.dart';
 import 'package:ignitia_dashboard/views/shift/shift_page.dart';
 import 'package:ignitia_dashboard/views/time_management/attendance/attendance_tm_page.dart';
@@ -41,6 +46,13 @@ class MenuList {
       MenuItemModel(44, Strings.titleNotificationPage, [1], const NotificationPage()),
       MenuItemModel(45, Strings.titleFilePage, [1], const CompanyFilePage()),
       MenuItemModel(46, Strings.titleReportBuilderPage, [1], const ReportBuilderPage()),
+    ]),
+    MenuItemModel(90, Strings.titleSettingsHub, [1], null, isParent: true, children: [
+      MenuItemModel(91, Strings.titleCompanySettingsPage, [1], const CompanyProfileSettingsPage()),
+      MenuItemModel(92, Strings.titleTimeAttendanceSettingsPage, [1], const TimeAttendanceSettingsPage()),
+      MenuItemModel(93, Strings.titlePayrollSettingsPage, [1], const PayrollSettingsPage()),
+      MenuItemModel(94, Strings.titleUserRoleSettingsPage, [1], const UserRoleSettingsPage()),
+      MenuItemModel(95, Strings.titleIntegrationSettingsPage, [1], const IntegrationSettingsPage()),
     ]),
     // Legacy flat entries kept for backward compat
     MenuItemModel(13, Strings.titleApproveOvertimePage, [1], const ApproveOvertimePage()),

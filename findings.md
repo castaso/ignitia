@@ -53,5 +53,15 @@
 - `ignitia_server/app/config.py:18,59` — Settings env
 - `ignitia_android/lib/repo/api_service.dart:64` — livenessChallenge endpoint
 
+## Findings — Phase 8 Settings (2026-09-03)
+- Klarifikasi final: 5 submenu, hanya admin `[1]`, MVP stub `_ApiHint` tanpa tabel baru, Android parent 90 ganti flat 98, paralel Dashboard+Android.
+- `ignitia_dashboard/lib/utils/menu_list.dart:25` — parent 30 Time + parent 40 Company sudah pakai `MenuItemModel:2` children/isParent + `menu_page.dart:63` ExpansionTile — reuse untuk Settings parent 90.
+- `ignitia_dashboard/lib/utils/string.dart:277` — Company hub keys ada, Settings hub belum ada — perlu 6 keys baru bilingual.
+- `ignitia_android/lib/utils/menu_list.dart:26-63` — flat `_menuList:27` 16 item, `SettingsPage(98)` hidden web `removeWhere:63`, `ProfilePage` dll — refactor ke parent 90 + `_parentItem` seperti dashboard `menu_page.dart:63-77`.
+- `ignitia_android/lib/views/menu_page.dart:18-97` — flat `ListView.builder:52` tanpa hasChildren — perlu port ExpansionTile branch.
+- `ignitia_android/lib/views/settings_page.dart:17` — 7 field lokal SharedPreference — keep legacy, 5 sub-page baru di `views/settings/`.
+- `ignitia_server/app/models.py:22-459` — Company, Shift, Break, PtkpStatus etc. cukup untuk _ApiHint referral — MVP tidak tambah tabel.
+- MVP pattern validated `company_admin/file/company_file_page.dart:22` `_ApiHint` + polish container `Colors.white` `Border.all(Colors.grey.shade200)` — reuse untuk 5 Settings pages.
+
 ## Visual/Browser Findings
 - Tidak ada screenshot/browser; semua evidence via codegraph read verbatim.
