@@ -29,6 +29,7 @@ router = APIRouter()
 _COMPANY_FIELDS = {
     "name", "code", "short_name", "address", "phone", "email",
     "website", "contact_person", "status_id",
+    "liveness_addon_active", "attendance_liveness_enabled", "break_liveness_enabled",
 }
 
 
@@ -86,8 +87,21 @@ def update_company(
     company = db.get(Company, payload.id)
     if company is None:
         return fail("Company not found")
+    # handle datetime field separately
+    if payload.liveness_addon_expires_at is not None:
+        try:
+            from datetime import datetime as _dt
+            # allow ISO string or None
+            val = payload.liveness_addon_expires_at
+            if val:
+                # strip trailing Z
+                company.liveness_addon_expires_at = _dt.fromisoformat(val.replace("Z", ""))
+            else:
+                company.liveness_addon_expires_at = None
+        except Exception:
+            pass
     for key, value in payload.model_dump(exclude_none=True).items():
-        if key == "id" or key not in _COMPANY_FIELDS:
+        if key in ("id", "liveness_addon_expires_at") or key not in _COMPANY_FIELDS:
             continue
         if key == "name":
             name = str(value).strip()
