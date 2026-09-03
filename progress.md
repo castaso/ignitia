@@ -54,15 +54,16 @@
 - Deliverable: Time Management + polish `1cd0909` pushed to origin/main
 
 ### Phase 7: Company Administration Hub
-- **Status:** in_progress
+- **Status:** complete
 - **Started:** 2026-09-03
+- **Completed:** 2026-09-03
 - Actions taken:
   - models.py +4 tables CompanyAsset/Announcement/Notification/CompanyFile (all categories/statuses, fan-out in-app only, private 20MB)
   - schemas.py CompanyAssetIn/AnnouncementIn + 5 json helpers
   - routers company_assets, announcements (publish fan-out), notifications (in-app), company_files (private per-uploader admin all=1), activity_logs (reuse AuditLog) + register main.py:15
   - dashboard strings Company hub bilingual, menu_list parent 40 +6 children, 6 polished views company_admin/**, api_service +12 endpoints; android mirror strings/menu_list
-  - create_all ok, 68 pytest pass, manual QA: Asset POST/GET, Announcement POST/publish fan-out 2 notifs, Notifications GET, ActivityLogs GET
-- Files created: 4 routers + 6 views + strings/menu_list both platforms
+  - create_all ok, 68 pytest pass, manual QA: Asset POST/GET, Announcement POST/publish fan-out 2 notifs, Notifications GET, ActivityLogs GET, pushed 3fbc757
+- Files created: 5 routers + 6 views + strings/menu_list both platforms
 
 ## Test Results
 | Test | Input | Expected | Actual | Status |

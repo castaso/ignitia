@@ -4,10 +4,10 @@
 Membangun (1) Time Management / Manajemen Waktu (roster mingguan, kehadiran, istirahat 1-tipe, cuti, timesheet + liveness per-company bilingual) + (2) **Company / Perusahaan Hub** untuk administrasi: Aset (semua kategori/status), Activity History (reuse AuditLog), Announcements → in-app Notifications, Files private per-uploader (admin monitor), Report Builder CSV Timesheet only.
 
 ## Next Step
-Phase 7: Implement Company Admin — models/routers + menu 40-series + 6 views.
+Done — Phases 1-7 complete. Next: flutter build_runner for api_service.g.dart if needed.
 
 ## Current Phase
-Phase 7: Company Administration Hub (in_progress)
+Phase 7: Company Administration Hub (complete)
 
 ## Phases
 
@@ -51,9 +51,9 @@ Phase 7: Company Administration Hub (in_progress)
 - [x] Klarifikasi: Q1 semua kategori/status aset, Q2 reuse AuditLog, Q3 in-app notif saja, Q4 files private per-uploader admin monitor, Q5 CSV timesheet export saja
 - [x] Server: CompanyAsset (5 status, 4 kategori), Announcement, Notification, CompanyFile + ActivityLogs (reuse AuditLog:272) + COMPANY_FILE_DIR via UPLOAD_DIR/company_files
 - [x] Routers: company_assets, announcements (publish fan-out), notifications (in-app), company_files (private 20MB), activity_logs + register main.py:15 (68 tests pass, manual QA Asset/Ann/Publish/Notif green)
-- [x] Flutter: strings Company hub bilingual, menu_list parent 40 +6 children, menu_page ExpansionTile reuse, views/company_admin/** 6 polished pages, api_service +12 endpoints
-- [ ] Verify: final polish + push (Android parity strings/menu_list done)
-- **Status:** in_progress
+- [x] Flutter: strings Company hub bilingual, menu_list parent 40 +6 children, menu_page ExpansionTile reuse, views/company_admin/** 6 polished pages, api_service +12 endpoints, android mirror
+- [x] Verify: pytest 68 pass, create_all 4 tables, manual QA green, pushed `3fbc757` → origin/main
+- **Status:** complete
 
 ## Key Questions
 1. Durasi istirahat default 60m window 12:00-13:00 OK? → **Resolved: OK, configurable per company via CompanyBreakConfig.**
