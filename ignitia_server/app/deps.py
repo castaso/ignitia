@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from .database import get_db
 from .models import Employee
-from .security import decode_token
+from .security import TokenExpired, decode_token
 
 
 def get_current_employee(
@@ -16,7 +16,10 @@ def get_current_employee(
     if not header.lower().startswith("bearer "):
         raise HTTPException(status_code=401, detail="Unauthorized")
     token = header.split(" ", 1)[1].strip()
-    employee_id = decode_token(token)
+    try:
+        employee_id = decode_token(token)
+    except TokenExpired:
+        raise HTTPException(status_code=401, detail="Token telah kedaluwarsa")
     if employee_id is None:
         raise HTTPException(status_code=401, detail="Unauthorized")
     employee = db.get(Employee, employee_id)

@@ -14,7 +14,7 @@ Wire contract (Flutter client — existing):
 New endpoints (employee-menu feature):
   POST /api/Employees                      (admin — create)
   GET  /api/Employees/importTemplate       (admin)
-  POST /api/Employees/import/upload        (admin — multipart)
+  POST /api/Employees/import               (admin — multipart)
   PUT  /api/Employees/{id}                 (admin — full update)
   PUT  /api/Employees/{id}/deactivate      (admin)
   GET  /api/Employees/{id}/transfers
@@ -160,21 +160,15 @@ def _enrich_employee(emp: Employee, db: Session) -> dict:
         .order_by(EmployeeTransfer.created_at.desc())
         .first()
     )
-    last_transfer_info = None
-    if last_t:
-        last_transfer_info = {
-            "last_transfer_date": last_t.effective_date,
-            "last_from_designation": last_t.from_designation,
-            "last_to_designation": last_t.to_designation,
-        }
-
-    return employee_json(
-        emp,
-        dept_name=dept_name,
-        ptkp_code=ptkp_code,
-        ptkp_annual_value=ptkp_annual,
-        last_transfer=last_transfer_info,
-    )
+    data = employee_json(emp, dept_name=dept_name, ptkp_code=ptkp_code,
+                         ptkp_annual_value=ptkp_annual)
+    data["department_name"] = dept_name
+    data["ptkp_status_code"] = ptkp_code
+    data["ptkp_annual_value"] = ptkp_annual
+    data["last_transfer_date"] = last_t.effective_date if last_t else None
+    data["last_from_designation"] = last_t.from_designation if last_t else None
+    data["last_to_designation"] = last_t.to_designation if last_t else None
+    return data
 
 
 # ===========================================================================
@@ -258,7 +252,7 @@ def create_employee(
     db: Session = Depends(get_db),
     auth: Employee = Depends(require_admin),
 ):
-    missing = [f for f in ("name", "employee_id", "email", "designation", "joining_date")
+    missing = [f for f in ("name", "employee_id", "email", "designation", "joining_date", "department_id")
                if not getattr(payload, f, None)]
     if missing:
         return fail(f"Field berikut wajib diisi: {', '.join(missing)}")
@@ -359,9 +353,9 @@ def register_reference_face(
 
 
 # ---------------------------------------------------------------------------
-# POST /api/Employees/import/upload  (bulk import — literal path before /{id})
+# POST /api/Employees/import  (bulk import — literal path before /{id})
 # ---------------------------------------------------------------------------
-@router.post("/Employees/import/upload")
+@router.post("/Employees/import")
 async def import_employees_upload(
     file: UploadFile,
     db: Session = Depends(get_db),
@@ -375,11 +369,15 @@ async def import_employees_upload(
     content = await file.read()
     filename = (file.filename or "").lower()
 
+    if filename.endswith(".xlsx") or filename.endswith(".xls"):
+        parser = parse_excel
+    elif filename.endswith(".csv") or not filename:
+        parser = parse_csv
+    else:
+        return fail("Format file tidak didukung. Gunakan CSV atau XLSX.")
+
     try:
-        if filename.endswith(".xlsx") or filename.endswith(".xls"):
-            rows = parse_excel(content)
-        else:
-            rows = parse_csv(content)
+        rows = parser(content)
     except Exception as exc:
         return fail(f"Gagal membaca file: {exc}")
 
@@ -443,14 +441,13 @@ async def import_employees_upload(
             db.flush()
             db.add(EmployeeContactInfo(id=emp.id))
             db.commit()
+            write_audit_log(db, "BULK_IMPORT", emp.id, auth.id,
+                            {"employee_id": emp.employee_id, "row": i})
             success_count += 1
         except Exception as exc:
             db.rollback()
             failed_count += 1
             errors.append({"row": i, "field": "", "message": str(exc)})
-
-    write_audit_log(db, "BULK_IMPORT", None, auth.id,
-                    {"total_rows": total, "success_count": success_count})
 
     return ok(
         message="Import selesai",

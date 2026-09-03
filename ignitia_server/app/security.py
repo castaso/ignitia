@@ -62,22 +62,30 @@ def verify_password(password: str, stored: str) -> bool:
 # ---------------------------------------------------------------------------
 
 
+class TokenExpired(Exception):
+    """Raised when a JWT has a valid signature but an expired exp claim."""
+
+
 def create_token(employee_id: int) -> str:
+    now = datetime.now(timezone.utc)
     payload = {
         "sub": str(employee_id),
-        "exp": datetime.now(timezone.utc).replace(tzinfo=None) + timedelta(hours=settings.JWT_EXPIRE_HOURS),
-        "iat": datetime.now(timezone.utc).replace(tzinfo=None),
+        "exp": now + timedelta(hours=settings.JWT_EXPIRE_HOURS),
+        "iat": now,
     }
     return jwt.encode(payload, settings.JWT_SECRET, algorithm=settings.JWT_ALGORITHM)
 
 
 def decode_token(token: str):
-    """Return the employee id (int) or None."""
+    """Return the employee id (int) or None. Raises TokenExpired when the
+    signature is valid but the exp claim has passed."""
     try:
         payload = jwt.decode(
             token, settings.JWT_SECRET, algorithms=[settings.JWT_ALGORITHM]
         )
         return int(payload["sub"])
+    except jwt.ExpiredSignatureError:
+        raise TokenExpired()
     except Exception:
         return None
 

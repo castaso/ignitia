@@ -19,6 +19,26 @@ def test_protected_endpoint_requires_bearer_token(client):
     assert client.get("/api/Employees/profile", params={"id": 1}).status_code == 401
 
 
+def test_expired_token_returns_401_with_indonesian_message(client):
+    import jwt
+    from datetime import datetime, timedelta, timezone
+
+    from app.config import settings
+
+    expired = jwt.encode(
+        {
+            "sub": "1",
+            "exp": datetime.now(timezone.utc) - timedelta(hours=1),
+            "iat": datetime.now(timezone.utc) - timedelta(hours=2),
+        },
+        settings.JWT_SECRET,
+        algorithm=settings.JWT_ALGORITHM,
+    )
+    r = client.get("/api/Employees/profile", params={"id": 1}, headers=auth(expired))
+    assert r.status_code == 401
+    assert r.json()["detail"] == "Token telah kedaluwarsa"
+
+
 def test_employee_list_and_profile(client, token):
     r = client.get("/api/Employees", headers=auth(token))
     assert r.status_code == 200
