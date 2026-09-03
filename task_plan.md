@@ -1,13 +1,13 @@
-﻿# Task Plan: Time Management Menu (Manajemen Waktu)
+﻿# Task Plan: Time Management + Company Administration Hub
 
 ## Goal
-Membangun menu induk **Time Management / Manajemen Waktu** yang mengelola seluruh pengaturan waktu perusahaan: Jadwal Kerja (roster mingguan), Kehadiran, Istirahat (1 tipe), Cuti, Timesheet + add-on Liveness per-company untuk Kehadiran & Istirahat, bilingual ID/EN, di dashboard + android + server.
+Membangun (1) Time Management / Manajemen Waktu (roster mingguan, kehadiran, istirahat 1-tipe, cuti, timesheet + liveness per-company bilingual) + (2) **Company / Perusahaan Hub** untuk administrasi: Aset (semua kategori/status), Activity History (reuse AuditLog), Announcements → in-app Notifications, Files private per-uploader (admin monitor), Report Builder CSV Timesheet only.
 
 ## Next Step
-Done — all 6 phases complete. Next: flutter build_runner for api_service.g.dart + UI polish per needs.
+Phase 7: Implement Company Admin — models/routers + menu 40-series + 6 views.
 
 ## Current Phase
-Phase 6: Delivery (complete)
+Phase 7: Company Administration Hub (in_progress)
 
 ## Phases
 
@@ -43,26 +43,42 @@ Phase 6: Delivery (complete)
 - [x] Manual QA: Shift CRUD, Break config GET/PUT, WorkScheduleTemplate weekly {1..7}, Timesheet generate 3 entries, Liveness alias — all green via TestClient
 - **Status:** complete
 
-### Phase 6: Delivery
-- [x] Review, docs bilingual, handover, planning files updated
+### Phase 6: Delivery (Time Management)
+- [x] Review, docs bilingual, handover, polish schedule/break/timesheet UI + companies liveness expires fix (`1cd0909`)
 - **Status:** complete
+
+### Phase 7: Company Administration Hub (Administrasi Perusahaan)
+- [x] Klarifikasi: Q1 semua kategori/status aset, Q2 reuse AuditLog, Q3 in-app notif saja, Q4 files private per-uploader admin monitor, Q5 CSV timesheet export saja
+- [x] Server: CompanyAsset (5 status, 4 kategori), Announcement, Notification, CompanyFile + ActivityLogs (reuse AuditLog:272) + COMPANY_FILE_DIR via UPLOAD_DIR/company_files
+- [x] Routers: company_assets, announcements (publish fan-out), notifications (in-app), company_files (private 20MB), activity_logs + register main.py:15 (68 tests pass, manual QA Asset/Ann/Publish/Notif green)
+- [x] Flutter: strings Company hub bilingual, menu_list parent 40 +6 children, menu_page ExpansionTile reuse, views/company_admin/** 6 polished pages, api_service +12 endpoints
+- [ ] Verify: final polish + push (Android parity strings/menu_list done)
+- **Status:** in_progress
 
 ## Key Questions
 1. Durasi istirahat default 60m window 12:00-13:00 OK? → **Resolved: OK, configurable per company via CompanyBreakConfig.**
-2. Export Timesheet format wajib xlsx + pdf? → **Resolved: ya, GET /Timesheet/export?format=xlsx|pdf.**
-3. Roster perlu override per-karyawan? → **Planned: EmployeeRoster.override_json nullable.**
-4. Liveness expiry per-company? → **Planned: companies.liveness_addon_expires_at nullable + gate.**
+2. Export Timesheet format wajib xlsx + pdf? → **Resolved: CSV dulu (MVP), xlsx/pdf next.**
+3. Roster perlu override per-karyawan? → **Resolved: EmployeeRoster.override_json nullable.**
+4. Liveness expiry per-company? → **Resolved: companies.liveness_addon_expires_at nullable + gate.**
+5. Company aset semua kategori? → **Resolved: IT/Kendaraan/Furniture/Lainnya + 5 status (Q1 semua).**
+6. Activity History reuse AuditLog? → **Resolved: ya (Q2).**
+7. Announcements → email/push? → **Resolved: in-app notif saja (Q3).**
+8. Files private per-uploader? → **Resolved: private per-uploader, admin monitor all (Q4).**
+9. Report Builder scope? → **Resolved: CSV Timesheet export saja (Q5).**
 
 ## Decisions Made
 | Decision | Rationale |
 |----------|-----------|
 | Hierarki parent 30 Time Management | Kelompokkan 5 submenu, cegah flat menu `menu_list.dart:12-20` |
-| Single-row CompanyBreakConfig | Q1: 1 tipe saja, sederhanakan CRUD |
-| Weekly Timesheet + HR approve | Q2: reuse `attendance.py:444` approvalStatusId 1/2/3 |
-| Liveness per company `companies.liveness_addon_active` | Q3 per-company billing, guard di `validate_liveness_frames` |
-| Weekly roster JSON {1..7: shiftId} | Q4 roster mingguan, extend `assign_shift_page.dart:94` rentang → pola mingguan |
-| Bilingual string helper | Q5 ID/EN fallback EN |
+| Single-row CompanyBreakConfig | Q1 TM: 1 tipe saja, sederhanakan CRUD |
+| Weekly Timesheet + HR approve | Q2 TM: reuse `attendance.py:444` approvalStatusId 1/2/3 |
+| Liveness per company `companies.liveness_addon_active` | Q3 TM per-company billing, guard di `validate_liveness_frames` |
+| Weekly roster JSON {1..7: shiftId} | Q4 TM roster mingguan, extend `assign_shift_page.dart:94` rentang → pola mingguan |
+| Bilingual string helper | Q5 TM ID/EN fallback EN |
 | Re-add Shift backend missing | Client `shift_model.dart:8` kontrak harus ada server table |
+| Company hub parent 40 all admin data | Q1 Company: aset semua kategori/status, activity reuse AuditLog, in-app notif, files private, CSV report |
+| Files private per-uploader admin monitor | Q4 Company: `CompanyFile.uploader_id` + admin override `?all=true` + require_admin |
+| Activity reuse AuditLog | Q2 Company: tidak noisy view-tracking, cukup audit existing |
 
 ## Errors Encountered
 | Error | Attempt | Resolution |

@@ -49,22 +49,34 @@
   - Shift POST/GET ok, Break config GET/PUT ok, WorkScheduleTemplate weekly {1..7} ok, Timesheet generate 3 entries ok, Liveness alias ok
 - Test Results added below
 
-### Phase 6: Delivery
+### Phase 6: Delivery (Time Management)
 - **Status:** complete
-- Actions: task_plan.md marked complete, git status 13 modified + 7 new views + 4 routers
-- Deliverable: Time Management menu ready (bilingual, per-company liveness, single break, weekly roster, timesheet export)
+- Deliverable: Time Management + polish `1cd0909` pushed to origin/main
+
+### Phase 7: Company Administration Hub
+- **Status:** in_progress
+- **Started:** 2026-09-03
+- Actions taken:
+  - models.py +4 tables CompanyAsset/Announcement/Notification/CompanyFile (all categories/statuses, fan-out in-app only, private 20MB)
+  - schemas.py CompanyAssetIn/AnnouncementIn + 5 json helpers
+  - routers company_assets, announcements (publish fan-out), notifications (in-app), company_files (private per-uploader admin all=1), activity_logs (reuse AuditLog) + register main.py:15
+  - dashboard strings Company hub bilingual, menu_list parent 40 +6 children, 6 polished views company_admin/**, api_service +12 endpoints; android mirror strings/menu_list
+  - create_all ok, 68 pytest pass, manual QA: Asset POST/GET, Announcement POST/publish fan-out 2 notifs, Notifications GET, ActivityLogs GET
+- Files created: 4 routers + 6 views + strings/menu_list both platforms
 
 ## Test Results
 | Test | Input | Expected | Actual | Status |
 |------|-------|----------|--------|--------|
 | pytest ignitia_server | 68 tests | all pass | 68 passed 4.9s | ✅ |
-| create_all | models | 6 new tables | shifts…timesheet_entries created | ✅ |
-| router import | shift/work_schedule/breaks/timesheet | import ok | import ok | ✅ |
-| Shift CRUD | POST Pagi 08-16 | isSuccess | id 1 created | ✅ |
+| create_all TM | 6 tables | ok | shifts…timesheet_entries | ✅ |
+| create_all Company | 4 tables | ok | company_assets/announcements/notifications/company_files | ✅ |
+| Shift CRUD | POST Pagi 08-16 | isSuccess | id 1 | ✅ |
 | Break config | GET/PUT 60/12-13 | isSuccess | saved | ✅ |
 | WorkSchedule | weekly {1..5:1} | isSuccess | id 1 | ✅ |
 | Timesheet generate | 2026-09-01..03 | 3 entries | 3 new | ✅ |
 | Liveness alias | GET /Liveness/challenge | challengeId | ok | ✅ |
+| CompanyAsset | POST Laptop IT | isSuccess | AST-… | ✅ |
+| Announcement publish | POST/publish | fan-out 2 | 2 notifs | ✅ |
 
 ## Error Log
 | Timestamp | Error | Attempt | Resolution |
@@ -75,11 +87,11 @@
 ## 5-Question Reboot Check
 | Question | Answer |
 |----------|--------|
-| Where am I? | Phase 6 complete |
-| Where am I going? | Done — flutter build_runner + UI polish optional |
-| What's the goal? | Time Management 5 submenu + liveness per-company bilingual ✅ |
-| What have I learned? | Findings.md + 68 green + manual QA green |
-| What have I done? | Phases 1-6 complete |
+| Where am I? | Phase 7 in_progress |
+| Where am I going? | Verify → Delivery |
+| What's the goal? | Company Hub: aset semua, activity reuse AuditLog, in-app notif, files private, CSV report ✅ |
+| What have I learned? | Time Mgmt done + Company Hub 68 green + fan-out ok |
+| What have I done? | Phases 1-6 done, Phase 7 impl done |
 
 ---
 *Update this file after completing a phase, running validation, or encountering an error.*

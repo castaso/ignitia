@@ -386,3 +386,74 @@ class TimesheetEntry(Base):
     __table_args__ = (
         UniqueConstraint("employee_id", "date", name="uq_timesheet_employee_date"),
     )
+
+
+# ---------------------------------------------------------------------------
+# Company Administration Hub — Assets, Announcements, Notifications, Files
+# ---------------------------------------------------------------------------
+
+
+class CompanyAsset(Base):
+    __tablename__ = "company_assets"
+
+    id = Column(Integer, primary_key=True, index=True)
+    company_id = Column(Integer, index=True, nullable=True)
+    asset_code = Column(String(50), unique=True, index=True)
+    name = Column(String(200), nullable=False)
+    category = Column(String(50), default="IT")  # IT / Kendaraan / Furniture / Lainnya
+    location = Column(String(200), nullable=True)
+    status = Column(String(30), default="Active")  # Active / Disposed / Maintenance / Lost / On Loan
+    assigned_employee_id = Column(Integer, nullable=True)
+    purchase_date = Column(String(20), nullable=True)  # yyyy-MM-dd
+    value = Column(Float, default=0.0)
+    description = Column(String(1000), nullable=True)
+    created_by = Column(Integer, nullable=True)
+    created_at = Column(DateTime, default=_now)
+    updated_at = Column(DateTime, default=_now, onupdate=_now)
+
+
+class Announcement(Base):
+    __tablename__ = "announcements"
+
+    id = Column(Integer, primary_key=True, index=True)
+    company_id = Column(Integer, index=True, nullable=True)
+    title = Column(String(300), nullable=False)
+    body = Column(Text, nullable=False)
+    audience = Column(String(20), default="ALL")  # ALL / DEPARTMENT / ROLE
+    department_id = Column(Integer, nullable=True)
+    is_pinned = Column(Integer, default=0)
+    publish_at = Column(String(25), nullable=True)
+    expires_at = Column(String(25), nullable=True)
+    created_by = Column(Integer, nullable=True)
+    created_at = Column(DateTime, default=_now)
+
+
+class Notification(Base):
+    __tablename__ = "notifications"
+
+    id = Column(Integer, primary_key=True, index=True)
+    recipient_employee_id = Column(Integer, index=True, nullable=False)
+    company_id = Column(Integer, nullable=True)
+    type = Column(String(30), default="announcement")  # announcement / asset / system
+    title = Column(String(300), nullable=False)
+    body = Column(Text, nullable=True)
+    payload_json = Column(Text, nullable=True)
+    is_read = Column(Integer, default=0)
+    read_at = Column(DateTime, nullable=True)
+    created_at = Column(DateTime, default=_now)
+
+
+class CompanyFile(Base):
+    __tablename__ = "company_files"
+
+    id = Column(Integer, primary_key=True, index=True)
+    company_id = Column(Integer, index=True, nullable=True)
+    uploader_id = Column(Integer, index=True, nullable=False)
+    file_name = Column(String(300), nullable=False)  # stored filename
+    original_name = Column(String(300), nullable=False)
+    mime = Column(String(100), nullable=True)
+    size_bytes = Column(Integer, default=0)
+    storage_path = Column(String(500), nullable=False)
+    category = Column(String(50), nullable=True)
+    description = Column(String(500), nullable=True)
+    created_at = Column(DateTime, default=_now)

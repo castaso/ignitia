@@ -215,4 +215,13 @@ class Strings{
   static const titleSchedulePage = "Work Schedule / Jadwal Kerja";
   static const titleBreakPage = "Break / Istirahat";
   static const titleTimesheetPage = "Timesheet";
+
+  // Company Hub bilingual
+  static const titleCompanyHub = "Company / Perusahaan";
+  static const titleAssetPage = "Assets / Aset";
+  static const titleActivityHistoryPage = "Activity History / Riwayat Aktivitas";
+  static const titleAnnouncementPage = "Announcements / Pengumuman";
+  static const titleNotificationPage = "Notifications / Notifikasi";
+  static const titleFilePage = "Files / Berkas";
+  static const titleReportBuilderPage = "Report Builder";
 }

@@ -13,14 +13,19 @@ from .config import settings
 from .database import Base, SessionLocal, engine
 from .migrations import run_migrations
 from .routers import (
+    activity_logs,
+    announcements,
     attendance,
     breaks,
     companies,
+    company_assets,
+    company_files,
     departments,
     employees,
     leave,
     login,
     manpower_plans,
+    notifications,
     overtime,
     payroll,
     ptkp_statuses,
@@ -93,6 +98,11 @@ def create_app() -> FastAPI:
         work_schedule.router,
         breaks.router,
         timesheet.router,
+        company_assets.router,
+        announcements.router,
+        notifications.router,
+        company_files.router,
+        activity_logs.router,
     ):
         app.include_router(router, prefix="/api")
 

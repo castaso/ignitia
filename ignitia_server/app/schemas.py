@@ -213,6 +213,34 @@ class TimesheetIn(BaseModel):
     model_config = ConfigDict(extra="ignore")
 
 
+class CompanyAssetIn(BaseModel):
+    id: int = 0
+    asset_code: Optional[str] = None
+    name: Optional[str] = None
+    category: Optional[str] = None  # IT / Kendaraan / Furniture / Lainnya
+    location: Optional[str] = None
+    status: Optional[str] = None  # Active / Disposed / Maintenance / Lost / On Loan
+    assigned_employee_id: Optional[int] = None
+    purchase_date: Optional[str] = None
+    value: Optional[float] = None
+    description: Optional[str] = None
+    company_id: Optional[int] = None
+    model_config = ConfigDict(extra="ignore")
+
+
+class AnnouncementIn(BaseModel):
+    id: int = 0
+    title: Optional[str] = None
+    body: Optional[str] = None
+    audience: Optional[str] = None  # ALL / DEPARTMENT / ROLE
+    department_id: Optional[int] = None
+    is_pinned: Optional[int] = None
+    publish_at: Optional[str] = None
+    expires_at: Optional[str] = None
+    company_id: Optional[int] = None
+    model_config = ConfigDict(extra="ignore")
+
+
 # --- responses ----------------------------------------------------------
 
 
@@ -354,6 +382,82 @@ def timesheet_json(row) -> dict:
         "status": row.status,
         "approved_by": row.approved_by,
         "rejection_reason": row.rejection_reason,
+    }
+
+
+def company_asset_json(row) -> dict:
+    return {
+        "id": row.id,
+        "company_id": row.company_id,
+        "asset_code": row.asset_code,
+        "name": row.name,
+        "category": row.category,
+        "location": row.location,
+        "status": row.status,
+        "assigned_employee_id": row.assigned_employee_id,
+        "purchase_date": row.purchase_date,
+        "value": row.value,
+        "description": row.description,
+        "created_by": row.created_by,
+        "created_at": row.created_at.isoformat() if row.created_at else None,
+    }
+
+
+def announcement_json(row) -> dict:
+    return {
+        "id": row.id,
+        "company_id": row.company_id,
+        "title": row.title,
+        "body": row.body,
+        "audience": row.audience,
+        "department_id": row.department_id,
+        "is_pinned": row.is_pinned,
+        "publish_at": row.publish_at,
+        "expires_at": row.expires_at,
+        "created_by": row.created_by,
+        "created_at": row.created_at.isoformat() if row.created_at else None,
+    }
+
+
+def notification_json(row) -> dict:
+    return {
+        "id": row.id,
+        "recipient_employee_id": row.recipient_employee_id,
+        "company_id": row.company_id,
+        "type": row.type,
+        "title": row.title,
+        "body": row.body,
+        "payload_json": row.payload_json,
+        "is_read": row.is_read,
+        "read_at": row.read_at.isoformat() if row.read_at else None,
+        "created_at": row.created_at.isoformat() if row.created_at else None,
+    }
+
+
+def company_file_json(row) -> dict:
+    return {
+        "id": row.id,
+        "company_id": row.company_id,
+        "uploader_id": row.uploader_id,
+        "file_name": row.file_name,
+        "original_name": row.original_name,
+        "mime": row.mime,
+        "size_bytes": row.size_bytes,
+        "storage_path": row.storage_path,
+        "category": row.category,
+        "description": row.description,
+        "created_at": row.created_at.isoformat() if row.created_at else None,
+    }
+
+
+def audit_log_json(row) -> dict:
+    return {
+        "id": row.id,
+        "action": row.action,
+        "target_employee_id": row.target_employee_id,
+        "performed_by": row.performed_by,
+        "timestamp": row.timestamp.isoformat() if row.timestamp else None,
+        "changed_fields": row.changed_fields,
     }
 
 

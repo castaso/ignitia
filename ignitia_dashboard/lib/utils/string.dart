@@ -273,4 +273,31 @@ class Strings{
   static const colHeaderWorkMinutes = "Work (min)";
   static const colHeaderBreakMinutes = "Break (min)";
   static const colHeaderOvertimeMinutes = "Overtime (min)";
+
+  // Company Administration Hub (Bilingual)
+  static const titleCompanyHub = "Company / Perusahaan";
+  static const titleCompanyProfilePage = "Company Profile / Profil Perusahaan";
+  static const titleAssetPage = "Assets / Aset";
+  static const titleAddAssetPage = "Add Asset / Tambah Aset";
+  static const titleActivityHistoryPage = "Activity History / Riwayat Aktivitas";
+  static const titleAnnouncementPage = "Announcements / Pengumuman";
+  static const titleNotificationPage = "Notifications / Notifikasi";
+  static const titleFilePage = "Files / Berkas";
+  static const titleReportBuilderPage = "Report Builder";
+  static const textAssetCode = "Asset Code";
+  static const textAssetName = "Asset Name";
+  static const textAssetCategory = "Category";
+  static const textAssetStatus = "Status";
+  static const textAnnouncementTitle = "Title / Judul";
+  static const textAnnouncementAudience = "Audience";
+  static const hintAssetName = "Enter asset name";
+  static const hintAnnouncementTitle = "Enter announcement title";
+  static const colHeaderAssetCode = "Asset Code";
+  static const colHeaderAssetName = "Asset Name";
+  static const colHeaderAssetCategory = "Category";
+  static const colHeaderAssetStatus = "Status";
+  static const colHeaderActivityAction = "Action";
+  static const colHeaderActivityUser = "User";
+  static const colHeaderAnnouncementTitle = "Title";
+  static const colHeaderFileName = "File Name";
 }

@@ -33,6 +33,11 @@ class MenuList{
       MenuItemModel(33, Strings.titleBreakPage, [1,2], const AttendancePage()),
       MenuItemModel(35, Strings.titleTimesheetPage, [1,2], const RequestListPage()),
     ]),
+    MenuItemModel(40, Strings.titleCompanyHub, [1,2], null, isParent: true, children: [
+      MenuItemModel(41, Strings.titleAssetPage, [1,2], const AdminAttendancePage()),
+      MenuItemModel(43, Strings.titleAnnouncementPage, [1,2], const HolidayPage()),
+      MenuItemModel(45, Strings.titleFilePage, [1,2], const AttendancePage()),
+    ]),
     MenuItemModel(5, Strings.titleAtttendanceListPage,[1], const AdminAttendancePage()),
     MenuItemModel(6, Strings.titleApproveAttendancePage,[1], ApproveAttendancePage()),
     MenuItemModel(13, Strings.titleApproveOvertimePage,[1], ApproveOvertimePage()),

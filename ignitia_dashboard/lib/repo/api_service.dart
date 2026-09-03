@@ -130,6 +130,43 @@ abstract class ApiService {
   @POST('Timesheet/approve')
   Future<ResponseModelWithoutData> approveTimesheet(@Header("Authorization") String token, @Body() dynamic payload);
 
+  // Company Hub — Aset, Activity, Announcements, Notifications, Files, Reports
+  @GET('CompanyAssets')
+  Future<dynamic> getCompanyAssets(@Header("Authorization") String token, @Query("company_id") int companyId, @Query("category") String category, @Query("status") String status);
+
+  @POST('CompanyAssets')
+  Future<ResponseModelWithoutData> addCompanyAsset(@Header("Authorization") String token, @Body() dynamic asset);
+
+  @PUT('CompanyAssets')
+  Future<ResponseModelWithoutData> updateCompanyAsset(@Header("Authorization") String token, @Body() dynamic asset);
+
+  @DELETE('CompanyAssets')
+  Future<ResponseModelWithoutData> deleteCompanyAsset(@Header("Authorization") String token, @Query("id") int id);
+
+  @GET('ActivityLogs')
+  Future<dynamic> getActivityLogs(@Header("Authorization") String token, @Query("employee_id") int employeeId, @Query("action") String action, @Query("startDate") String startDate, @Query("endDate") String endDate);
+
+  @GET('Announcements')
+  Future<dynamic> getAnnouncements(@Header("Authorization") String token, @Query("company_id") int companyId);
+
+  @POST('Announcements')
+  Future<ResponseModelWithoutData> addAnnouncement(@Header("Authorization") String token, @Body() dynamic ann);
+
+  @POST('Announcements/{id}/publish')
+  Future<ResponseModelWithoutData> publishAnnouncement(@Header("Authorization") String token, @Path("id") int id);
+
+  @GET('Notifications')
+  Future<dynamic> getNotifications(@Header("Authorization") String token, @Query("is_read") int isRead);
+
+  @POST('Notifications/{id}/read')
+  Future<ResponseModelWithoutData> markNotificationRead(@Header("Authorization") String token, @Path("id") int id);
+
+  @POST('CompanyFiles')
+  Future<ResponseModelWithoutData> uploadCompanyFile(@Header("Authorization") String token, @Body() dynamic formData);
+
+  @GET('CompanyFiles')
+  Future<dynamic> getCompanyFiles(@Header("Authorization") String token, @Query("all") int all);
+
   @GET('Employees')
   Future<EmployeeListResponseModel> getEmployeeList(@Header("Authorization") String token);
 
