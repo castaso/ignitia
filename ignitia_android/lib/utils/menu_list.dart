@@ -28,6 +28,11 @@ class MenuList{
     MenuItemModel(1, Strings.titleHome,[1,2], FieldValue.userTypeId == 2 ? HomeScreen() : AdminHomeScreen()),
     MenuItemModel(2, Strings.titleProfilePage,[1,2], ProfilePage()),
     MenuItemModel(3, Strings.titleAdminEmployeeListPage,[1], EmployeeListPage()),
+    MenuItemModel(30, Strings.titleTimeManagement, [1,2], null, isParent: true, children: [
+      MenuItemModel(31, Strings.titleSchedulePage, [1,2], const AdminAttendancePage()),
+      MenuItemModel(33, Strings.titleBreakPage, [1,2], const AttendancePage()),
+      MenuItemModel(35, Strings.titleTimesheetPage, [1,2], const RequestListPage()),
+    ]),
     MenuItemModel(5, Strings.titleAtttendanceListPage,[1], const AdminAttendancePage()),
     MenuItemModel(6, Strings.titleApproveAttendancePage,[1], ApproveAttendancePage()),
     MenuItemModel(13, Strings.titleApproveOvertimePage,[1], ApproveOvertimePage()),

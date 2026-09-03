@@ -240,4 +240,37 @@ class Strings{
   static const textShiftDuration = "Duration (Hrs)";
   static const textShiftActive = "Active";
   static const textShiftInactive = "Inactive";
+
+  // Time Management (Bilingual ID/EN)
+  static const titleTimeManagement = "Time Management / Manajemen Waktu";
+  static const titleSchedulePage = "Work Schedule / Jadwal Kerja";
+  static const titleScheduleTemplatePage = "Schedule Templates / Template Jadwal";
+  static const titleRosterPage = "Roster Assignment / Penugasan Roster";
+  static const titleAttendancePageTM = "Attendance / Kehadiran";
+  static const titleAttendanceSettingsPage = "Attendance Settings / Pengaturan Kehadiran";
+  static const titleBreakPage = "Break / Istirahat";
+  static const titleBreakConfigPage = "Break Config / Konfigurasi Istirahat";
+  static const titleLeavePageTM = "Leave / Cuti";
+  static const titleTimesheetPage = "Timesheet";
+  static const titleTimesheetDetailPage = "Timesheet Detail";
+  static const textLivenessAddon = "Liveness Add-on";
+  static const textAttendanceLiveness = "Attendance Liveness";
+  static const textBreakLiveness = "Break Liveness";
+  static const textBreakDuration = "Break Duration (min)";
+  static const textBreakWindow = "Break Window";
+  static const textBreakPaid = "Paid Break";
+  static const textWeeklyPattern = "Weekly Pattern / Pola Mingguan";
+  static const textMonday = "Monday / Senin";
+  static const textTuesday = "Tuesday / Selasa";
+  static const textWednesday = "Wednesday / Rabu";
+  static const textThursday = "Thursday / Kamis";
+  static const textFriday = "Friday / Jumat";
+  static const textSaturday = "Saturday / Sabtu";
+  static const textSunday = "Sunday / Minggu";
+  static const hintBreakDuration = "60";
+  static const colHeaderBreakStart = "Break Start";
+  static const colHeaderBreakEnd = "Break End";
+  static const colHeaderWorkMinutes = "Work (min)";
+  static const colHeaderBreakMinutes = "Break (min)";
+  static const colHeaderOvertimeMinutes = "Overtime (min)";
 }

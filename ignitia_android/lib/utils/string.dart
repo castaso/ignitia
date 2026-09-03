@@ -209,4 +209,10 @@ class Strings{
   static const colHeaderEmail = "Email";
   static const colHeaderDesignation = "Designation";
   static const colHeaderActive = "Active";
+
+  // Time Management bilingual
+  static const titleTimeManagement = "Time Management / Manajemen Waktu";
+  static const titleSchedulePage = "Work Schedule / Jadwal Kerja";
+  static const titleBreakPage = "Break / Istirahat";
+  static const titleTimesheetPage = "Timesheet";
 }

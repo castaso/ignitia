@@ -32,6 +32,12 @@ class Company(Base):
     website = Column(String(200), nullable=True)
     contact_person = Column(String(200), nullable=True)
     status_id = Column(Integer, default=1)  # 1 = active
+    # Liveness add-on per company (billing)
+    liveness_addon_active = Column(Integer, default=0)  # 0=off, 1=on
+    liveness_addon_expires_at = Column(DateTime, nullable=True)
+    # Time Management toggles (per company)
+    attendance_liveness_enabled = Column(Integer, default=0)
+    break_liveness_enabled = Column(Integer, default=0)
     created_at = Column(DateTime, default=_now)
 
 
@@ -272,3 +278,111 @@ class AuditLog(Base):
     performed_by = Column(Integer)
     timestamp = Column(DateTime, default=_now)
     changed_fields = Column(Text, nullable=True)  # JSON string
+
+
+# ---------------------------------------------------------------------------
+# Time Management — Shift, Roster, Break, Timesheet
+# ---------------------------------------------------------------------------
+
+
+class Shift(Base):
+    __tablename__ = "shifts"
+
+    id = Column(Integer, primary_key=True, index=True)
+    shift_name = Column(String(200), nullable=False)
+    start_time = Column(String(5), nullable=False)  # HH:mm
+    end_time = Column(String(5), nullable=False)  # HH:mm
+    description = Column(String(500), default="")
+    status_id = Column(Integer, default=1)  # 1 Active, 2 Inactive
+    created_at = Column(DateTime, default=_now)
+
+
+class WorkScheduleTemplate(Base):
+    __tablename__ = "work_schedule_templates"
+
+    id = Column(Integer, primary_key=True, index=True)
+    company_id = Column(Integer, nullable=True)
+    name = Column(String(200), nullable=False)
+    # JSON: {"1": shift_id_monday, ..., "7": shift_id_sunday} (1=Mon..7=Sun)
+    weekly_pattern = Column(Text, nullable=False)
+    effective_from = Column(String(20), nullable=True)  # yyyy-MM-dd
+    effective_to = Column(String(20), nullable=True)
+    is_active = Column(Integer, default=1)
+    created_by = Column(Integer, nullable=True)
+    created_at = Column(DateTime, default=_now)
+
+
+class EmployeeRoster(Base):
+    __tablename__ = "employee_rosters"
+
+    id = Column(Integer, primary_key=True, index=True)
+    employee_id = Column(Integer, index=True, nullable=False)
+    template_id = Column(Integer, index=True, nullable=True)
+    # Per-employee override JSON same shape as weekly_pattern, nullable
+    override_pattern = Column(Text, nullable=True)
+    effective_from = Column(String(20), nullable=True)
+    effective_to = Column(String(20), nullable=True)
+    created_by = Column(Integer, nullable=True)
+    created_at = Column(DateTime, default=_now)
+
+
+class CompanyBreakConfig(Base):
+    __tablename__ = "company_break_configs"
+
+    id = Column(Integer, primary_key=True, index=True)
+    company_id = Column(Integer, unique=True, index=True)
+    duration_minutes = Column(Integer, default=60)
+    allowed_start = Column(String(5), default="12:00")
+    allowed_end = Column(String(5), default="13:00")
+    is_paid = Column(Integer, default=0)
+    liveness_required = Column(Integer, default=0)
+    is_active = Column(Integer, default=1)
+    created_at = Column(DateTime, default=_now)
+    updated_at = Column(DateTime, default=_now, onupdate=_now)
+
+
+class BreakSession(Base):
+    __tablename__ = "break_sessions"
+
+    id = Column(Integer, primary_key=True, index=True)
+    employee_id = Column(Integer, index=True, nullable=False)
+    company_id = Column(Integer, nullable=True)
+    date_time = Column(String(20), index=True)  # yyyy-MM-dd
+    break_start = Column(String(25), nullable=True)  # yyyy-MM-ddTHH:mm:ss
+    break_end = Column(String(25), nullable=True)
+    duration_minutes = Column(Integer, nullable=True)
+    status = Column(String(20), default="InProgress")  # InProgress / Completed
+    latitude = Column(Float, nullable=True)
+    longitude = Column(Float, nullable=True)
+    end_latitude = Column(Float, nullable=True)
+    end_longitude = Column(Float, nullable=True)
+    start_address = Column(String(500), nullable=True)
+    end_address = Column(String(500), nullable=True)
+    start_face = Column(String(500), nullable=True)
+    end_face = Column(String(500), nullable=True)
+    created_at = Column(DateTime, default=_now)
+
+
+class TimesheetEntry(Base):
+    __tablename__ = "timesheet_entries"
+
+    id = Column(Integer, primary_key=True, index=True)
+    employee_id = Column(Integer, index=True, nullable=False)
+    company_id = Column(Integer, nullable=True)
+    date = Column(String(20), index=True)  # yyyy-MM-dd
+    shift_id = Column(Integer, nullable=True)
+    check_in = Column(String(25), nullable=True)
+    check_out = Column(String(25), nullable=True)
+    break_minutes = Column(Integer, default=0)
+    work_minutes = Column(Integer, default=0)
+    overtime_minutes = Column(Integer, default=0)
+    late_minutes = Column(Integer, default=0)
+    status = Column(String(20), default="Draft")  # Draft / Submitted / Approved / Rejected
+    approved_by = Column(Integer, nullable=True)
+    rejection_reason = Column(String(1000), nullable=True)
+    created_at = Column(DateTime, default=_now)
+    updated_at = Column(DateTime, default=_now, onupdate=_now)
+
+    __table_args__ = (
+        UniqueConstraint("employee_id", "date", name="uq_timesheet_employee_date"),
+    )

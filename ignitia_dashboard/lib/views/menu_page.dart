@@ -43,11 +43,15 @@ class MenuPage extends StatelessWidget {
               scrollDirection: Axis.vertical,
               itemCount: menuList.length,
               itemBuilder: (BuildContext context, int index) {
+                final item = menuList[index];
+                if (item.hasChildren) {
+                  return _parentItem(context, item);
+                }
                 return ListTile(
                   contentPadding: const EdgeInsets.only(left: 0, right: 0),
-                  title: _menuItem(menuList[index]),
+                  title: _menuItem(item),
                   onTap: () {
-                    _menuItemTapped(context, menuList[index].id, menuList[index].page);
+                    _menuItemTapped(context, item.id, item.page);
                   },
                 );
               }),
@@ -55,7 +59,24 @@ class MenuPage extends StatelessWidget {
       ),
     );
   }
-}
+
+  Widget _parentItem(BuildContext context, MenuItemModel parent) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 2),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(4)),
+      child: ExpansionTile(
+        title: TitleTextView(parent.name, textSize: 15, fontFamily: Fonts.gilroy_semibold),
+        childrenPadding: const EdgeInsets.only(left: 12, right: 0, bottom: 8),
+        children: parent.children!.map((child) {
+          return ListTile(
+            contentPadding: const EdgeInsets.only(left: 0, right: 0),
+            title: _childItem(child),
+            onTap: () => _menuItemTapped(context, child.id, child.page),
+          );
+        }).toList(),
+      ),
+    );
+  }
 
 _menuItem(MenuItemModel menu) {
   return Container(
@@ -79,6 +100,23 @@ _menuItem(MenuItemModel menu) {
               Icons.arrow_forward_ios,
               size: 14,
             )
+        ],
+      ),
+    ),
+  );
+}
+
+_childItem(MenuItemModel menu) {
+  return Container(
+    height: 44,
+    decoration: BoxDecoration(color: const Color(0xFFF5F5F5), borderRadius: BorderRadius.circular(4)),
+    child: Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      child: Row(
+        children: [
+          TitleTextView(menu.name, textSize: 14, fontFamily: Fonts.gilroy_medium),
+          const Spacer(),
+          const Icon(Icons.arrow_forward_ios, size: 12),
         ],
       ),
     ),

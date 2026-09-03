@@ -23,7 +23,7 @@ from ..config import settings
 from ..database import get_db
 from ..dates import date_key, datetime_key, parse_date
 from ..deps import get_current_employee
-from ..models import Attendance, AttendanceEditRequest, Employee, UserLeave
+from ..models import Attendance, AttendanceEditRequest, Company, Employee, UserLeave
 from ..schemas import (
     AttendanceIn,
     attendance_json,
@@ -84,11 +84,40 @@ def _resolve_employee_id(auth_employee: Employee, body_id: int | None) -> int:
 # ---------------------------------------------------------------------------
 
 
+def _company_liveness_required(db: Session, kind: str) -> bool:
+    """Per-company gate: addon must be active and the specific toggle enabled."""
+    try:
+        company = db.query(Company).first()
+        if company is None:
+            return settings.LIVENESS_REQUIRED
+        if not getattr(company, "liveness_addon_active", 0):
+            return False
+        # Optional expiry
+        exp = getattr(company, "liveness_addon_expires_at", None)
+        if exp is not None:
+            from datetime import datetime as _dt
+            if _dt.now() > exp:
+                return False
+        if kind == "attendance":
+            return bool(getattr(company, "attendance_liveness_enabled", 0))
+        if kind == "break":
+            return bool(getattr(company, "break_liveness_enabled", 0))
+        return settings.LIVENESS_REQUIRED
+    except Exception:
+        return settings.LIVENESS_REQUIRED
+
+
 @router.get("/Attendance/livenessChallenge")
-def liveness_challenge(auth: Employee = Depends(get_current_employee)):
+def liveness_challenge(db: Session = Depends(get_db), auth: Employee = Depends(get_current_employee)):
     """Issue a short-lived, single-use challenge that must accompany the
     liveness frames on the next check-in / check-out. Requires the client to
     capture fresh frames for each attempt."""
+    return ok(data={"challengeId": issue_liveness_challenge()})
+
+
+@router.get("/Liveness/challenge")
+def liveness_challenge_generic(db: Session = Depends(get_db), auth: Employee = Depends(get_current_employee)):
+    """Generic alias used by Break (Istirahat) — same challenge pool."""
     return ok(data={"challengeId": issue_liveness_challenge()})
 
 
@@ -112,10 +141,11 @@ def check_in(
     if not ok_face:
         return fail(error)
 
-    # 3. Liveness (blink challenge) frame validation.
+    # 3. Liveness (blink challenge) frame validation — per-company addon.
+    _req = _company_liveness_required(db, "attendance")
     ok_liveness, liveness_error = validate_liveness_frames(
         payload.liveness_frames,
-        required=settings.LIVENESS_REQUIRED,
+        required=_req,
         challenge_id=payload.challenge_id,
     )
     if not ok_liveness:
@@ -185,10 +215,11 @@ def check_out(
     if not ok_face:
         return fail(error)
 
-    # 3. Liveness (blink challenge) frame validation.
+    # 3. Liveness (blink challenge) frame validation — per-company addon.
+    _req2 = _company_liveness_required(db, "attendance")
     ok_liveness, liveness_error = validate_liveness_frames(
         payload.liveness_frames,
-        required=settings.LIVENESS_REQUIRED,
+        required=_req2,
         challenge_id=payload.challenge_id,
     )
     if not ok_liveness:

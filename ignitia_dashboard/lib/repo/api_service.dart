@@ -85,6 +85,51 @@ abstract class ApiService {
   @POST('Shift/assignShift')
   Future<ResponseModelWithoutData> assignShift(@Header("Authorization") String token, @Body() EmployeeShiftAssignModel assignModel, @Query("employeeName") String employeeName);
 
+  // Time Management — Work Schedule (roster mingguan)
+  @GET('WorkSchedule/templates')
+  Future<dynamic> getWorkScheduleTemplates(@Header("Authorization") String token);
+
+  @POST('WorkSchedule/templates')
+  Future<ResponseModelWithoutData> addWorkScheduleTemplate(@Header("Authorization") String token, @Body() dynamic template);
+
+  @PUT('WorkSchedule/templates')
+  Future<ResponseModelWithoutData> updateWorkScheduleTemplate(@Header("Authorization") String token, @Body() dynamic template);
+
+  @DELETE('WorkSchedule/templates')
+  Future<ResponseModelWithoutData> deleteWorkScheduleTemplate(@Header("Authorization") String token, @Query("id") int id);
+
+  @GET('WorkSchedule/rosters')
+  Future<dynamic> getRosters(@Header("Authorization") String token, @Query("employee_id") int employeeId);
+
+  @POST('WorkSchedule/rosters/bulk')
+  Future<ResponseModelWithoutData> bulkAssignRoster(@Header("Authorization") String token, @Body() dynamic payload);
+
+  // Time Management — Break (Istirahat, 1 tipe per company)
+  @GET('Break/config')
+  Future<dynamic> getBreakConfig(@Header("Authorization") String token);
+
+  @PUT('Break/config')
+  Future<ResponseModelWithoutData> updateBreakConfig(@Header("Authorization") String token, @Body() dynamic config);
+
+  @GET('Break/sessions')
+  Future<dynamic> getBreakSessions(@Header("Authorization") String token, @Query("employee_id") int employeeId, @Query("startDate") String startDate, @Query("endDate") String endDate);
+
+  @GET('Liveness/challenge')
+  Future<dynamic> getLivenessChallenge(@Header("Authorization") String token);
+
+  // Time Management — Timesheet (weekly, HR approve + export)
+  @GET('Timesheet')
+  Future<dynamic> getTimesheet(@Header("Authorization") String token, @Query("employee_id") int employeeId, @Query("startDate") String startDate, @Query("endDate") String endDate);
+
+  @POST('Timesheet/generate')
+  Future<ResponseModelWithoutData> generateTimesheet(@Header("Authorization") String token, @Query("employee_id") int employeeId, @Query("startDate") String startDate, @Query("endDate") String endDate);
+
+  @POST('Timesheet/submit')
+  Future<ResponseModelWithoutData> submitTimesheet(@Header("Authorization") String token, @Body() dynamic payload);
+
+  @POST('Timesheet/approve')
+  Future<ResponseModelWithoutData> approveTimesheet(@Header("Authorization") String token, @Body() dynamic payload);
+
   @GET('Employees')
   Future<EmployeeListResponseModel> getEmployeeList(@Header("Authorization") String token);
 

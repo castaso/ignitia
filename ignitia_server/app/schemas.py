@@ -136,7 +136,80 @@ class CompanyIn(BaseModel):
     website: Optional[str] = None
     contact_person: Optional[str] = None
     status_id: Optional[int] = None
+    liveness_addon_active: Optional[int] = None
+    liveness_addon_expires_at: Optional[str] = None
+    attendance_liveness_enabled: Optional[int] = None
+    break_liveness_enabled: Optional[int] = None
 
+    model_config = ConfigDict(extra="ignore")
+
+
+class ShiftIn(BaseModel):
+    id: int = 0
+    shift_name: Optional[str] = None
+    start_time: Optional[str] = None
+    end_time: Optional[str] = None
+    description: Optional[str] = None
+    status_id: Optional[int] = None
+    model_config = ConfigDict(extra="ignore")
+
+
+class WorkScheduleTemplateIn(BaseModel):
+    id: int = 0
+    company_id: Optional[int] = None
+    name: Optional[str] = None
+    weekly_pattern: Optional[dict] = None  # {"1":1,"2":1,...}
+    effective_from: Optional[str] = None
+    effective_to: Optional[str] = None
+    is_active: Optional[int] = None
+    model_config = ConfigDict(extra="ignore")
+
+
+class EmployeeRosterIn(BaseModel):
+    id: int = 0
+    employee_id: Optional[int] = None
+    template_id: Optional[int] = None
+    override_pattern: Optional[dict] = None
+    effective_from: Optional[str] = None
+    effective_to: Optional[str] = None
+    model_config = ConfigDict(extra="ignore")
+
+
+class BreakConfigIn(BaseModel):
+    company_id: Optional[int] = None
+    duration_minutes: Optional[int] = None
+    allowed_start: Optional[str] = None
+    allowed_end: Optional[str] = None
+    is_paid: Optional[int] = None
+    liveness_required: Optional[int] = None
+    is_active: Optional[int] = None
+    model_config = ConfigDict(extra="ignore")
+
+
+class BreakSessionIn(BaseModel):
+    id: int = 0
+    employee_id: Optional[int] = None
+    date_time: Optional[str] = None
+    break_start: Optional[str] = None
+    break_end: Optional[str] = None
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
+    end_latitude: Optional[float] = None
+    end_longitude: Optional[float] = None
+    start_address: Optional[str] = None
+    end_address: Optional[str] = None
+    face_image: Optional[str] = None
+    liveness_frames: Optional[List[str]] = None
+    challenge_id: Optional[str] = None
+    model_config = ConfigDict(extra="ignore")
+
+
+class TimesheetIn(BaseModel):
+    id: int = 0
+    employee_id: Optional[int] = None
+    date: Optional[str] = None
+    status: Optional[str] = None
+    rejection_reason: Optional[str] = None
     model_config = ConfigDict(extra="ignore")
 
 
@@ -195,7 +268,92 @@ def company_json(company) -> dict:
         "website": company.website,
         "contact_person": company.contact_person,
         "status_id": company.status_id,
+        "liveness_addon_active": getattr(company, "liveness_addon_active", 0) or 0,
+        "liveness_addon_expires_at": company.liveness_addon_expires_at.isoformat() if getattr(company, "liveness_addon_expires_at", None) else None,
+        "attendance_liveness_enabled": getattr(company, "attendance_liveness_enabled", 0) or 0,
+        "break_liveness_enabled": getattr(company, "break_liveness_enabled", 0) or 0,
         "created_at": company.created_at.isoformat() if company.created_at else None,
+    }
+
+
+def shift_json(row) -> dict:
+    return {
+        "id": row.id,
+        "shift_name": row.shift_name,
+        "start_time": row.start_time,
+        "end_time": row.end_time,
+        "description": row.description or "",
+        "status_id": row.status_id,
+    }
+
+
+def work_schedule_template_json(row) -> dict:
+    import json as _json
+    pattern = row.weekly_pattern
+    try:
+        pattern = _json.loads(pattern) if isinstance(pattern, str) else pattern
+    except Exception:
+        pattern = {}
+    return {
+        "id": row.id,
+        "company_id": row.company_id,
+        "name": row.name,
+        "weekly_pattern": pattern,
+        "effective_from": row.effective_from,
+        "effective_to": row.effective_to,
+        "is_active": row.is_active,
+        "created_by": row.created_by,
+    }
+
+
+def break_config_json(row) -> dict:
+    return {
+        "id": row.id,
+        "company_id": row.company_id,
+        "duration_minutes": row.duration_minutes,
+        "allowed_start": row.allowed_start,
+        "allowed_end": row.allowed_end,
+        "is_paid": row.is_paid,
+        "liveness_required": row.liveness_required,
+        "is_active": row.is_active,
+    }
+
+
+def break_session_json(row) -> dict:
+    return {
+        "id": row.id,
+        "employee_id": row.employee_id,
+        "company_id": row.company_id,
+        "date_time": row.date_time,
+        "break_start": row.break_start,
+        "break_end": row.break_end,
+        "duration_minutes": row.duration_minutes,
+        "status": row.status,
+        "latitude": row.latitude,
+        "longitude": row.longitude,
+        "end_latitude": row.end_latitude,
+        "end_longitude": row.end_longitude,
+        "start_address": row.start_address,
+        "end_address": row.end_address,
+    }
+
+
+def timesheet_json(row) -> dict:
+    return {
+        "id": row.id,
+        "employee_id": row.employee_id,
+        "company_id": row.company_id,
+        "date": row.date,
+        "shift_id": row.shift_id,
+        "check_in": row.check_in,
+        "check_out": row.check_out,
+        "break_minutes": row.break_minutes,
+        "work_minutes": row.work_minutes,
+        "overtime_minutes": row.overtime_minutes,
+        "late_minutes": row.late_minutes,
+        "status": row.status,
+        "approved_by": row.approved_by,
+        "rejection_reason": row.rejection_reason,
     }
 
 

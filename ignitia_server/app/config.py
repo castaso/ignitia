@@ -66,6 +66,11 @@ class Settings:
     # replayed against a later check-in.
     LIVENESS_CHALLENGE_TTL_SECONDS = int(_env("LIVENESS_CHALLENGE_TTL_SECONDS", "60"))
 
+    # Break defaults (single type per company)
+    BREAK_DEFAULT_DURATION = int(_env("BREAK_DEFAULT_DURATION", "60"))
+    BREAK_DEFAULT_START = _env("BREAK_DEFAULT_START", "12:00")
+    BREAK_DEFAULT_END = _env("BREAK_DEFAULT_END", "13:00")
+
     DATABASE_URL = _env("DATABASE_URL", "sqlite:///./ignitia.db")
 
     # Approval status ids (convention used by the Flutter client).

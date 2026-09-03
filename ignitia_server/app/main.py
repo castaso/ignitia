@@ -14,6 +14,7 @@ from .database import Base, SessionLocal, engine
 from .migrations import run_migrations
 from .routers import (
     attendance,
+    breaks,
     companies,
     departments,
     employees,
@@ -24,6 +25,9 @@ from .routers import (
     payroll,
     ptkp_statuses,
     replacement_tracking,
+    shift,
+    timesheet,
+    work_schedule,
 )
 from .seed import seed_ptkp_statuses
 
@@ -85,6 +89,10 @@ def create_app() -> FastAPI:
         ptkp_statuses.router,
         manpower_plans.router,
         replacement_tracking.router,
+        shift.router,
+        work_schedule.router,
+        breaks.router,
+        timesheet.router,
     ):
         app.include_router(router, prefix="/api")
 
