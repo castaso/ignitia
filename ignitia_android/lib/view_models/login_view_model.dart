@@ -87,7 +87,7 @@ class LoginViewModel extends ChangeNotifier{
     setLoading(true);
     try {
       final supabase = Supabase.instance.client;
-      final ok = await supabase.auth.signInWithOAuth(Provider.google, redirectTo: 'com.naas.i_employment://login-callback');
+      final ok = await supabase.auth.signInWithOAuth(OAuthProvider.google, redirectTo: 'com.naas.i_employment://login-callback');
       if (!ok) { setErrorMsg("Google sign-in was cancelled"); setLoading(false); return; }
       final sub = supabase.auth.onAuthStateChange.listen((data) async {
         final session = data.session;

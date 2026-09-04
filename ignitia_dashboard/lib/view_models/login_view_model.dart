@@ -86,7 +86,7 @@ class LoginViewModel extends ChangeNotifier{
     try {
       final supabase = Supabase.instance.client;
       final redirected = await supabase.auth.signInWithOAuth(
-        Provider.google,
+        OAuthProvider.google,
         redirectTo: Uri.base.origin,
       );
       if (!redirected) {
