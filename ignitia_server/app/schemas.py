@@ -241,6 +241,17 @@ class AnnouncementIn(BaseModel):
     model_config = ConfigDict(extra="ignore")
 
 
+class TaskIn(BaseModel):
+    id: int = 0
+    title: Optional[str] = None
+    description: Optional[str] = None
+    assigned_employee_id: Optional[int] = None
+    assigned_by: Optional[int] = None
+    due_date: Optional[str] = None
+    status: Optional[str] = None  # Open / InProgress / Done
+    model_config = ConfigDict(extra="ignore")
+
+
 # --- responses ----------------------------------------------------------
 
 
@@ -550,4 +561,21 @@ def overtime_json(row) -> dict:
         "supervisoR_ID": row.supervisoR_ID,
         "name": row.name,
         "designation": row.designation,
+    }
+
+
+def task_json(row, *, assignee_name: str | None = None,
+              created_by_name: str | None = None) -> dict:
+    return {
+        "id": row.id,
+        "title": row.title,
+        "description": row.description,
+        "assigned_employee_id": row.assigned_employee_id,
+        "assigned_by": row.assigned_by,
+        "due_date": row.due_date,
+        "status": row.status or "Open",
+        "assignee_name": assignee_name,
+        "created_by_name": created_by_name,
+        "created_at": row.created_at.isoformat() if row.created_at else None,
+        "updated_at": row.updated_at.isoformat() if row.updated_at else None,
     }

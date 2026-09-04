@@ -7,13 +7,13 @@ part of 'shift_model.dart';
 // **************************************************************************
 
 ShiftModel _$ShiftModelFromJson(Map<String, dynamic> json) => ShiftModel(
-      shiftName: json['shift_name'] as String,
-      startTime: json['start_time'] as String,
-      endTime: json['end_time'] as String,
-      description: json['description'] as String? ?? "",
-      statusId: json['status_id'] as int? ?? 1,
-      id: json['id'] as int? ?? 0,
-    );
+  shiftName: json['shift_name'] as String,
+  startTime: json['start_time'] as String,
+  endTime: json['end_time'] as String,
+  description: json['description'] as String? ?? "",
+  statusId: (json['status_id'] as num?)?.toInt() ?? 1,
+  id: (json['id'] as num?)?.toInt() ?? 0,
+);
 
 Map<String, dynamic> _$ShiftModelToJson(ShiftModel instance) =>
     <String, dynamic>{

@@ -10,9 +10,14 @@ class CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
   final String title;
   final List<ToolBarItemModel>? list;
   final bool withMenu;
+  final List<Widget>? actions;
 
   const CustomAppBar(
-      {Key? key, required this.title, this.list, this.withMenu = true})
+      {Key? key,
+      required this.title,
+      this.list,
+      this.withMenu = true,
+      this.actions})
       : super(key: key);
 
   @override
@@ -58,11 +63,18 @@ class _CustomAppBarState extends State<CustomAppBar> {
           alignment: Alignment.centerRight,
           child: mediaSize.width > webWidth ? UserInfoWidget() : Container(),
         ),
-        actions:
-            mediaSize.width > webWidth ? null : _toolbarList() // <IconButton>[
-        //_toolbarIcon(ToolBarItemModel(99, const Icon(Icons.menu), const MenuPage()))
-        //],
+        actions: _combinedActions(mediaSize),
         );
+  }
+
+  List<Widget> _combinedActions(Size mediaSize) {
+    final items = <Widget>[];
+    if (mediaSize.width < webWidth) {
+      final toolbar = _toolbarList();
+      if (toolbar != null) items.addAll(toolbar);
+    }
+    if (widget.actions != null) items.addAll(widget.actions!);
+    return items;
   }
 
   _toolbarList() {

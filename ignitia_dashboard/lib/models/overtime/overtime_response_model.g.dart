@@ -7,19 +7,20 @@ part of 'overtime_response_model.dart';
 // **************************************************************************
 
 OvertimeResponseModel _$OvertimeResponseModelFromJson(
-        Map<String, dynamic> json) =>
+  Map<String, dynamic> json,
+) =>
     OvertimeResponseModel(
-      (json['data'] as List<dynamic>)
-          .map((e) => OvertimeModel.fromJson(e as Map<String, dynamic>))
-          .toList(),
-    )
+        (json['data'] as List<dynamic>)
+            .map((e) => OvertimeModel.fromJson(e as Map<String, dynamic>))
+            .toList(),
+      )
       ..isSuccess = json['isSuccess'] as bool
       ..message = json['message'] as String;
 
 Map<String, dynamic> _$OvertimeResponseModelToJson(
-        OvertimeResponseModel instance) =>
-    <String, dynamic>{
-      'isSuccess': instance.isSuccess,
-      'message': instance.message,
-      'data': instance.data,
-    };
+  OvertimeResponseModel instance,
+) => <String, dynamic>{
+  'isSuccess': instance.isSuccess,
+  'message': instance.message,
+  'data': instance.data,
+};

@@ -320,4 +320,101 @@ class Strings{
   static const hintWebhookUrl = "https://...";
   static const colHeaderIntegrationName = "Integration";
   static const colHeaderIntegrationStatus = "Status";
+
+  // Dashboard Super-Admin (English, per reference spec)
+  static const titleDashboardHome = "Home";
+  static const titleEmployeeProfile = "Employee Profile";
+  static const titleEmployees = "Employees";
+  static const titleRecruitment = "Recruitment";
+  static const titleTime = "Time";
+  static const titleFinance = "Finance";
+  static const titlePayroll = "Payroll";
+  static const titleProductivity = "Productivity";
+  static const titleCompany = "Company";
+  static const titleApplications = "Applications";
+  static const titleIntegrations = "Integrations";
+  static const titleSettings = "Settings";
+
+  static const textCoreAndNonCore = "Core & Non-Core";
+  static const textSummarizeData = "Summarize Data";
+  static const textQuickAction = "Quick Action";
+  static const textSearchEmployee = "Search employee...";
+  static const textInbox = "Inbox";
+  static const textSwitchApp = "Switch App";
+
+  static const textMyInfo = "My Info";
+  static const textAccountSettings = "Account Settings";
+  static const textCompanyInfo = "Company Info";
+  static const textCompanyList = "Company List";
+  static const textRequestPicContact = "Request PIC Contact";
+  static const textSwitchToOldNavigation = "Switch to old navigation";
+  static const textSupportCenter = "Support Center";
+  static const textHelp = "Help";
+
+  static const textShortcut = "Shortcut";
+  static const textLiveAttendance = "Live Attendance";
+  static const textRequestBenefitReimbursement = "Request Benefit Reimbursement";
+  static const textRequestTimeOff = "Request Time Off";
+  static const textMoreRequest = "More Request";
+  static const textCashAdvance = "Cash Advance";
+  static const textOvertime = "Overtime";
+  static const textChangeShift = "Change Shift";
+
+  static const textChart = "Chart";
+  static const metricEmploymentStatus = "Employment Status";
+  static const metricLengthOfService = "Length of Service";
+  static const metricJobLevel = "Job Level";
+  static const metricGenderDiversity = "Gender Diversity";
+
+  static const textQuickLinks = "Quick Links";
+  static const textAddEmployee = "Add Employee";
+  static const textEmployeeTransfer = "Employee Transfer";
+  static const textCompanySettings = "Company Settings";
+  static const textIntegration = "Integration";
+
+  static const textBalanceTimeOff = "Balance Time Off";
+  static const textEntitlement = "Entitlement";
+  static const textTaken = "Taken";
+  static const textBalance = "Balance";
+
+  static const textAppForms = "Forms";
+  static const textAppPerformanceReview = "Performance Review";
+  static const textAppTalentManagement = "Talent Management";
+  static const textAppInsight = "Insight";
+  static const textAppTimesheet = "Timesheet";
+  static const textAppDocumentTemplate = "Document Template";
+  static const textAppRecruitment = "Recruitment";
+  static const textAppTalentics = "Talentics";
+  static const textAppMarketplace = "Marketplace";
+
+  static const textAnnouncement = "Announcement";
+  static const textCategory = "Category";
+  static const textManage = "Manage";
+
+  static const textContractProbation = "Contract & Probation";
+  static const textDaysRemaining = "days remaining";
+  static const textOverdue = "overdue";
+
+  static const textTask = "Task";
+  static const textTaskTitle = "Title";
+  static const textTaskDescription = "Description";
+  static const textTaskAssignee = "Assign To";
+  static const textTaskDueDate = "Due Date";
+  static const textTaskStatus = "Status";
+  static const taskStatusOpen = "Open";
+  static const taskStatusInProgress = "InProgress";
+  static const taskStatusDone = "Done";
+  static const btnTextAddTask = "ADD TASK";
+
+  static const textWhosOff = "Who's Off";
+  static const textNextDays = "next %d days";
+
+  static const textDownloadMobile = "Download Ignitia Mobile";
+  static const textAppStore = "App Store";
+  static const textGooglePlay = "Google Play";
+
+  static const textComingSoon = "Coming Soon";
+  static const textComingSoonHint = "This feature is part of the Ignitia roadmap and will be available soon.";
+  static const textEmpty = "Nothing here yet.";
+  static const textErrorPrefix = "Error";
 }

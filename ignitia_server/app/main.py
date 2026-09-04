@@ -20,6 +20,7 @@ from .routers import (
     companies,
     company_assets,
     company_files,
+    dashboard,
     departments,
     employees,
     leave,
@@ -34,7 +35,7 @@ from .routers import (
     timesheet,
     work_schedule,
 )
-from .seed import seed_ptkp_statuses
+from .seed import seed_employee_dashboard_fields, seed_ptkp_statuses
 
 
 @asynccontextmanager
@@ -47,6 +48,7 @@ async def lifespan(app: FastAPI):
     db = SessionLocal()
     try:
         seed_ptkp_statuses(db)
+        seed_employee_dashboard_fields(db)
     finally:
         db.close()
     yield
@@ -103,6 +105,7 @@ def create_app() -> FastAPI:
         notifications.router,
         company_files.router,
         activity_logs.router,
+        dashboard.router,
     ):
         app.include_router(router, prefix="/api")
 

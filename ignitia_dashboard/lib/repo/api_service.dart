@@ -11,6 +11,7 @@ import 'package:ignitia_dashboard/models/security/login_response_model.dart';
 import 'package:ignitia_dashboard/models/shift/employee_shift_assign_model.dart';
 import 'package:ignitia_dashboard/models/shift/shift_model.dart';
 import 'package:ignitia_dashboard/models/shift/shift_response_model.dart';
+import 'package:ignitia_dashboard/models/task/task_model.dart';
 import 'package:retrofit/retrofit.dart';
 import 'package:retrofit/http.dart';
 
@@ -175,4 +176,37 @@ abstract class ApiService {
 
   @POST('Login/ForgetPassword')
   Future<ResponseModelWithoutData> forgetPassword(@Header("Authorization") String token, @Query("email") String email);
+
+  // Dashboard — Super-Admin home aggregation
+  @GET('Dashboard/summary')
+  Future<dynamic> getDashboardSummary(@Header("Authorization") String token);
+
+  @GET('Dashboard/employeeChart')
+  Future<dynamic> getEmployeeChart(@Header("Authorization") String token, @Query("metric") String metric);
+
+  @GET('Dashboard/whoIsOff')
+  Future<dynamic> getWhoIsOff(@Header("Authorization") String token, @Query("days") int days);
+
+  @GET('Dashboard/contractProbation')
+  Future<dynamic> getContractProbation(@Header("Authorization") String token, @Query("window_days") int windowDays);
+
+  @GET('Dashboard/aiSummary')
+  Future<dynamic> getAiSummary(@Header("Authorization") String token);
+
+  // Leave balance (Balance Time Off card)
+  @GET('Leave/getEmployeeLeaveSummary')
+  Future<dynamic> getEmployeeLeaveSummary(@Header("Authorization") String token, @Query("employeeId") int employeeId);
+
+  // Dashboard — Tasks
+  @GET('Tasks')
+  Future<dynamic> getTasks(@Header("Authorization") String token, @Query("status") String? status, @Query("assigned_to") int? assignedTo);
+
+  @POST('Tasks')
+  Future<dynamic> addTask(@Header("Authorization") String token, @Body() TaskModel task);
+
+  @PUT('Tasks')
+  Future<dynamic> updateTask(@Header("Authorization") String token, @Body() TaskModel task);
+
+  @DELETE('Tasks')
+  Future<dynamic> deleteTask(@Header("Authorization") String token, @Query("id") int id);
 }

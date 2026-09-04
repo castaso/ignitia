@@ -122,3 +122,4 @@ _childItem(MenuItemModel menu) {
     ),
   );
 }
+}

@@ -90,6 +90,12 @@ class Employee(Base):
     # --- payroll (used to build the payslip) ---
     basic_salary = Column(Float, default=0.0)
 
+    # --- dashboard chart dimensions (nullable for backward compat) ---
+    gender = Column(String(10), nullable=True)  # Male / Female
+    job_level = Column(String(100), nullable=True)  # Staff / Supervisor / Manager / Director
+    employment_status = Column(String(50), nullable=True)  # Full-time / Contract / Intern
+    contract_end_date = Column(String(25), nullable=True)  # yyyy-MM-dd
+
 
 class EmployeeContactInfo(Base):
     __tablename__ = "employee_contact_info"
@@ -457,3 +463,22 @@ class CompanyFile(Base):
     category = Column(String(50), nullable=True)
     description = Column(String(500), nullable=True)
     created_at = Column(DateTime, default=_now)
+
+
+# ---------------------------------------------------------------------------
+# Dashboard — Tasks
+# ---------------------------------------------------------------------------
+
+
+class Task(Base):
+    __tablename__ = "tasks"
+
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String(300), nullable=False)
+    description = Column(Text, nullable=True)
+    assigned_employee_id = Column(Integer, index=True, nullable=True)  # FK → employees.id
+    assigned_by = Column(Integer, nullable=True)  # employees.id of the creator
+    due_date = Column(String(25), nullable=True)  # yyyy-MM-dd
+    status = Column(String(20), default="Open")  # Open / InProgress / Done
+    created_at = Column(DateTime, default=_now)
+    updated_at = Column(DateTime, default=_now, onupdate=_now)

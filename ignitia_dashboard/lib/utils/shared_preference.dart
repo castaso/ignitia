@@ -186,6 +186,16 @@ class SessionManager{
     prefs.setBool("alertForMissingOvertime", alertForMissingOvertime);
   }
 
+  // dashboard navigation style (spec item 8: Switch to old navigation)
+  static Future<bool> getUseOldNavigation() async {
+    final SharedPreferences pref = await SharedPreferences.getInstance();
+    return pref.getBool("useOldNavigation") ?? false;
+  }
+  static Future<void> setUseOldNavigation(bool useOldNavigation) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setBool("useOldNavigation", useOldNavigation);
+  }
+
   // attendance location restriction of the current user
   static Future<String> getAttendanceLocationType() async {
     final SharedPreferences pref = await SharedPreferences.getInstance();

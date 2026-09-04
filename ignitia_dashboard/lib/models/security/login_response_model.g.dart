@@ -8,10 +8,10 @@ part of 'login_response_model.dart';
 
 LoginResponseModel _$LoginResponseModelFromJson(Map<String, dynamic> json) =>
     LoginResponseModel(
-      json['data'] == null
-          ? null
-          : EmployeeModel.fromJson(json['data'] as Map<String, dynamic>),
-    )
+        json['data'] == null
+            ? null
+            : EmployeeModel.fromJson(json['data'] as Map<String, dynamic>),
+      )
       ..isSuccess = json['isSuccess'] as bool
       ..message = json['message'] as String;
 

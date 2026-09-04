@@ -3,6 +3,7 @@ import 'package:ignitia_dashboard/utils/colors.dart';
 import 'package:ignitia_dashboard/utils/global_fields.dart';
 import 'package:ignitia_dashboard/utils/shared_preference.dart';
 import 'package:ignitia_dashboard/utils/string.dart';
+import 'package:ignitia_dashboard/view_models/dashboard_view_model.dart';
 import 'package:ignitia_dashboard/view_models/employee_view_model.dart';
 import 'package:ignitia_dashboard/view_models/holiday_view_model.dart';
 import 'package:ignitia_dashboard/view_models/login_view_model.dart';
@@ -41,6 +42,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => LoginViewModel()),
+        ChangeNotifierProvider(create: (_) => DashboardViewModel()),
         ChangeNotifierProvider(create: (_) => EmployeeViewModel()),
         ChangeNotifierProvider(create: (_) => HolidayViewModel()),
         ChangeNotifierProvider(create: (_) => OvertimeViewModel()),

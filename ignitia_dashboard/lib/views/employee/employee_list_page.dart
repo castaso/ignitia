@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:ignitia_dashboard/components/loading_widget.dart';
 import 'package:ignitia_dashboard/utils/colors.dart';
 import 'package:ignitia_dashboard/utils/string.dart';
+import 'package:ignitia_dashboard/models/employee/employee_model.dart';
 import 'package:ignitia_dashboard/views/employee/employee_detail_page.dart';
 import 'package:trina_grid/trina_grid.dart';
 import 'package:provider/provider.dart';
@@ -18,7 +19,11 @@ import '../../view_models/employee_view_model.dart';
 import '../menu_page.dart';
 
 class EmployeeListPage extends StatefulWidget {
-  const EmployeeListPage({Key? key}) : super(key: key);
+  /// Optional keyword coming from the dashboard top-bar search
+  /// (spec item 5). Filters name / employee id / email / designation.
+  final String? searchQuery;
+
+  const EmployeeListPage({Key? key, this.searchQuery}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _EmployeeListPageState();
@@ -347,7 +352,18 @@ class _EmployeeListPageState extends State<EmployeeListPage> {
   }
 
   _getTableRowsForEmployeeDetail(EmployeeViewModel viewModel) {
-    List<TrinaRow> rows = viewModel.employeeList
+    final query = widget.searchQuery?.toLowerCase().trim() ?? "";
+    List<EmployeeModel> filtered = viewModel.employeeList;
+    if (query.isNotEmpty) {
+      filtered = viewModel.employeeList
+          .where((e) =>
+              e.employeeName.toLowerCase().contains(query) ||
+              e.employeeId.toLowerCase().contains(query) ||
+              e.email.toLowerCase().contains(query) ||
+              e.designation.toLowerCase().contains(query))
+          .toList();
+    }
+    List<TrinaRow> rows = filtered
         .asMap()
         .entries
         .map((e) => TrinaRow(cells: {

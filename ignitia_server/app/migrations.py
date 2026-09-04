@@ -25,6 +25,11 @@ def run_migrations(engine) -> None:
             "ptkp_status_id": "INTEGER",
             "deactivate_date": "VARCHAR(25)",
             "deactivate_reason": "VARCHAR(500)",
+            # Dashboard chart dimensions + contract/probation window
+            "gender": "VARCHAR(10)",
+            "job_level": "VARCHAR(100)",
+            "employment_status": "VARCHAR(50)",
+            "contract_end_date": "VARCHAR(25)",
         }
         for col, coltype in new_emp_cols.items():
             if col not in existing_emp:

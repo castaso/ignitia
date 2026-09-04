@@ -7,19 +7,20 @@ part of 'employee_list_response_model.dart';
 // **************************************************************************
 
 EmployeeListResponseModel _$EmployeeListResponseModelFromJson(
-        Map<String, dynamic> json) =>
+  Map<String, dynamic> json,
+) =>
     EmployeeListResponseModel(
-      (json['data'] as List<dynamic>?)
-          ?.map((e) => EmployeeModel.fromJson(e as Map<String, dynamic>))
-          .toList(),
-    )
+        (json['data'] as List<dynamic>?)
+            ?.map((e) => EmployeeModel.fromJson(e as Map<String, dynamic>))
+            .toList(),
+      )
       ..isSuccess = json['isSuccess'] as bool
       ..message = json['message'] as String;
 
 Map<String, dynamic> _$EmployeeListResponseModelToJson(
-        EmployeeListResponseModel instance) =>
-    <String, dynamic>{
-      'isSuccess': instance.isSuccess,
-      'message': instance.message,
-      'data': instance.data,
-    };
+  EmployeeListResponseModel instance,
+) => <String, dynamic>{
+  'isSuccess': instance.isSuccess,
+  'message': instance.message,
+  'data': instance.data,
+};

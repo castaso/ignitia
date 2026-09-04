@@ -8,17 +8,17 @@ part of 'employee_model.dart';
 
 EmployeeModel _$EmployeeModelFromJson(Map<String, dynamic> json) =>
     EmployeeModel(
-      json['id'] as int,
+      (json['id'] as num).toInt(),
       json['name'] as String,
       json['designation'] as String,
       json['cell_no'] as String?,
       json['email'] as String,
       json['address'] as String?,
       json['nid'] as String?,
-      json['type_id'] as int,
+      (json['type_id'] as num).toInt(),
       json['employee_id'] as String,
-      json['supervisor_id'] as int,
-      json['status_id'] as int,
+      (json['supervisor_id'] as num).toInt(),
+      (json['status_id'] as num).toInt(),
       DateTime.parse(json['joining_date'] as String),
       json['permanent_date'] == null
           ? null

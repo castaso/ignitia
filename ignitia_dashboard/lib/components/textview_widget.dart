@@ -4,13 +4,13 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:marquee/marquee.dart';
 class TitleTextView extends StatelessWidget {
 
-  String text;
-  double textSize;
-  Color textColor;
-  TextAlign textAlign;
-  Fonts fontFamily;
-  int? maxLines;
-  TitleTextView(this.text, {this.textSize = 12.0,this.textColor = titleTextColor,this.textAlign = TextAlign.left,this.fontFamily = Fonts.gilroy_semibold,this.maxLines});
+  final String text;
+  final double textSize;
+  final Color textColor;
+  final TextAlign textAlign;
+  final Fonts fontFamily;
+  final int? maxLines;
+  const TitleTextView(this.text, {this.textSize = 12.0,this.textColor = titleTextColor,this.textAlign = TextAlign.left,this.fontFamily = Fonts.gilroy_semibold,this.maxLines});
 
   @override
   Widget build(BuildContext context) {
@@ -82,12 +82,12 @@ _questrialStyleG(double textSize,FontWeight fontWeight,Color textColor){
 }
 
 class SubTitleTextView extends StatelessWidget {
-  String text;
-  double textSize;
-  Color textColor;
-  TextAlign textAlign;
-  Fonts fontFamily;
-  SubTitleTextView(this.text, {this.textSize = 12.0,this.textColor = subTitleTextColor,this.textAlign = TextAlign.left,this.fontFamily = Fonts.gilroy_regular});
+  final String text;
+  final double textSize;
+  final Color textColor;
+  final TextAlign textAlign;
+  final Fonts fontFamily;
+  const SubTitleTextView(this.text, {this.textSize = 12.0,this.textColor = subTitleTextColor,this.textAlign = TextAlign.left,this.fontFamily = Fonts.gilroy_regular});
 
   @override
   Widget build(BuildContext context) {
@@ -100,9 +100,9 @@ class SubTitleTextView extends StatelessWidget {
 }
 
 class MarqueeTextView extends StatelessWidget {
-  String text;
-  double textSize;
-  MarqueeTextView(this.text, {this.textSize = 12.0});
+  final String text;
+  final double textSize;
+  const MarqueeTextView(this.text, {this.textSize = 12.0});
 
   @override
   Widget build(BuildContext context) {
