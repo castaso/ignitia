@@ -6,7 +6,10 @@ Rebuild `DashboardHomeScreen` (ignitia_dashboard, Flutter Web) into the Ignitia 
 **NOTE:** Reference image `[Image 1]` / `dashboard.jpg` NOT viewable (no image input). Layout follows the docx's 19-element order in a standard Ignitia card grid. User to flag visual mismatches after smoke test.
 
 ## Next Step
-Phase 6 complete — awaiting user visual review (no commit unless asked)
+All done — Company ID footer shipped (commit pushed after ebf494f)
+
+## Current Phase
+Phase 7: Company ID Footer (reference sidebar bottom)
 
 ## Current Phase
 Phase 6: Layout Alignment (reference image)
@@ -77,6 +80,14 @@ Phase 6: Layout Alignment (reference image)
 - [x] `top_bar_widget.dart`: "HRIS" label; `dashboard_home_screen.dart`: alert banner + greeting + charts + 3-col (left/center/right) layout + narrow stacking
 - [x] Skipped: Company ID footer (no company id available client-side)
 - [x] Verify: analyze 0 errors, flutter test 4/4, build web release exit 0
+- **Status:** complete
+
+### Phase 7: Company ID Footer (reference sidebar bottom)
+- [x] `api_service.dart` + `GET Companies` (regenerated via temp build, +22 lines)
+- [x] `dashboard_services.dart` `getCompanies()`; VM `companyCode` (active company's code, fallback id) + `_loadCompany()` in loadAll
+- [x] New `company_footer.dart`: "Company ID" + code + "Learn more" → CompanyProfileSettingsPage; pinned bottom of `MenuPage` (Column: Expanded list + footer); hidden when no company record
+- [x] Fixed self-inflicted regression: dropped material import in menu_page.dart → 90+ cascade errors → restored
+- [x] Verify: analyze 0 errors, flutter test 4/4, web release exit 0
 - **Status:** complete
 
 ## Key Questions

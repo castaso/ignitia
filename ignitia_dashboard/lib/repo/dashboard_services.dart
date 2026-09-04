@@ -104,6 +104,14 @@ class DashboardService {
     }
   }
 
+  // ---- Company ID footer (spec: sidebar bottom) ----
+
+  static Future<Object> getCompanies() => _call(() {
+        var api = ApiService(dio.Dio());
+        return api.getCompanies('Bearer ${FieldValue.token}')
+            .then((d) => d as Map<String, dynamic>);
+      });
+
   // ---- Tasks ----
 
   static Future<Object> getTasks({String? status, int? assignedTo}) =>

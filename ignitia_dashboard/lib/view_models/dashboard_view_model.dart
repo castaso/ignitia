@@ -58,6 +58,10 @@ class DashboardViewModel extends BaseViewModel {
   int _unreadCount = 0;
   int get unreadCount => _unreadCount;
 
+  // ---- Company ID (sidebar footer) ----
+  String _companyCode = "";
+  String get companyCode => _companyCode;
+
   int get pendingApprovalsTotal =>
       ((_summary["pending_overtime"] as int? ?? 0)) +
       ((_summary["pending_leave"] as int? ?? 0)) +
@@ -73,7 +77,26 @@ class DashboardViewModel extends BaseViewModel {
       _loadAnnouncements(),
       _loadTasks(),
       _loadUnreadCount(),
+      _loadCompany(),
     ]);
+  }
+
+  Future<void> _loadCompany() async {
+    var res = await DashboardService.getCompanies();
+    if (res is Success &&
+        res.response is List &&
+        (res.response as List).isNotEmpty) {
+      final companies = (res.response as List)
+          .whereType<Map>()
+          .map((e) => e.cast<String, dynamic>())
+          .toList();
+      final active =
+          companies.where((c) => (c["status_id"] as int? ?? 1) == 1).toList();
+      final pick = (active.isNotEmpty ? active : companies).first;
+      final code = (pick["code"] ?? "").toString();
+      _companyCode = code.isNotEmpty ? code : "${pick["id"]}";
+      notifyListeners();
+    }
   }
 
   Future<void> _loadSummary() async {

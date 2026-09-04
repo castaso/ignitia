@@ -75,6 +75,16 @@
   | Tasks create/update/delete | lifecycle | Open→Done→deleted→404 | ✅ |
   | flutter build web --release | built | Built build/web (205s) | ✅ |
 
+### Phase 7: Company ID Footer (reference sidebar bottom)
+- **Status:** complete
+- Actions taken:
+  - `api_service.dart` + `GET Companies`; regen in temp build (in-repo build_runner still hangs on file locks) → api_service.g.dart +22 lines only
+  - `dashboard_services.dart` getCompanies(); VM `companyCode` (active company code, id fallback) + `_loadCompany()` in loadAll
+  - New `company_footer.dart` pinned bottom of MenuPage (Column: Expanded list + footer); hidden when no company row (dev DB has none — footer auto-hides until a company exists)
+  - Regression fixed: dropped material import in menu_page.dart during edit → 90+ cascade errors → restored
+- Verify: analyze 0 errors, flutter test 4/4, web release exit 0
+- **Note:** ebf494f (Phase 6) committed+pushed; this footer ships as the follow-up commit
+
 ## 5-Question Reboot Check
 | Question | Answer |
 |----------|--------|

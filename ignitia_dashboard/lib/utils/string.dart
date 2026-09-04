@@ -412,6 +412,8 @@ class Strings{
   static const textDownloadMobile = "Download Ignitia Mobile";
   static const textAppStore = "App Store";
   static const textGooglePlay = "Google Play";
+  static const textCompanyId = "Company ID";
+  static const textLearnMore = "Learn more";
 
   static const textComingSoon = "Coming Soon";
   static const textComingSoonHint = "This feature is part of the Ignitia roadmap and will be available soon.";

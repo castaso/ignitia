@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:ignitia_dashboard/components/textview_widget.dart';
 import 'package:ignitia_dashboard/models/menu_item_model.dart';
 import 'package:ignitia_dashboard/utils/constants.dart';
@@ -6,7 +7,7 @@ import 'package:ignitia_dashboard/utils/colors.dart';
 import 'package:ignitia_dashboard/utils/global_fields.dart';
 import 'package:ignitia_dashboard/utils/menu_list.dart';
 import 'package:ignitia_dashboard/utils/navigation_utils.dart';
-import 'package:flutter/material.dart';
+import 'package:ignitia_dashboard/views/home/dashboard/company_footer.dart';
 import 'package:ignitia_dashboard/views/dashboard_home_screen.dart';
 
 class MenuPage extends StatelessWidget {
@@ -38,23 +39,30 @@ class MenuPage extends StatelessWidget {
         child: Container(
           constraints: BoxConstraints(maxWidth: 500),
           color: pageBGColor,
-          child: ListView.builder(
-              shrinkWrap: true,
-              scrollDirection: Axis.vertical,
-              itemCount: menuList.length,
-              itemBuilder: (BuildContext context, int index) {
-                final item = menuList[index];
-                if (item.hasChildren) {
-                  return _parentItem(context, item);
-                }
-                return ListTile(
-                  contentPadding: const EdgeInsets.only(left: 0, right: 0),
-                  title: _menuItem(item),
-                  onTap: () {
-                    _menuItemTapped(context, item.id, item.page);
-                  },
-                );
-              }),
+          child: Column(
+            children: [
+              Expanded(
+                child: ListView.builder(
+                    shrinkWrap: true,
+                    scrollDirection: Axis.vertical,
+                    itemCount: menuList.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      final item = menuList[index];
+                      if (item.hasChildren) {
+                        return _parentItem(context, item);
+                      }
+                      return ListTile(
+                        contentPadding: const EdgeInsets.only(left: 0, right: 0),
+                        title: _menuItem(item),
+                        onTap: () {
+                          _menuItemTapped(context, item.id, item.page);
+                        },
+                      );
+                    }),
+              ),
+              const CompanyFooter(),
+            ],
+          ),
         ),
       ),
     );

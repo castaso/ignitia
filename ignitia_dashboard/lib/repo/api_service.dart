@@ -197,6 +197,10 @@ abstract class ApiService {
   @GET('Leave/getEmployeeLeaveSummary')
   Future<dynamic> getEmployeeLeaveSummary(@Header("Authorization") String token, @Query("employeeId") int employeeId);
 
+  // Company ID footer (sidebar bottom)
+  @GET('Companies')
+  Future<dynamic> getCompanies(@Header("Authorization") String token);
+
   // Dashboard — Tasks
   @GET('Tasks')
   Future<dynamic> getTasks(@Header("Authorization") String token, @Query("status") String? status, @Query("assigned_to") int? assignedTo);
