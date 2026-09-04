@@ -41,6 +41,9 @@ abstract class ApiService {
   @POST('Login')
   Future<LoginResponseModel> Login(@Body() LoginRequestModel loginRequestModel);
 
+  @POST('Login/supabase')
+  Future<LoginResponseModel> loginWithSupabase(@Body() Map<String, dynamic> body);
+
   @GET('Overtime')
   Future<OvertimeResponseModel> getOvertimeList(@Header("Authorization") String token, @Query("id") int id, @Query("startDate") String startDate, @Query("endDate") String endDate);
 

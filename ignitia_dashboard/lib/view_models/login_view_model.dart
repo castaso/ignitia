@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:ignitia_dashboard/repo/login_services.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:ignitia_dashboard/repo/api_status.dart';
 import 'package:ignitia_dashboard/utils/global_fields.dart';
 import 'package:ignitia_dashboard/utils/message.dart';
@@ -48,6 +49,15 @@ class LoginViewModel extends ChangeNotifier{
     notifyListeners();
   }
 
+  bool get isSupabaseConfigured {
+    try {
+      Supabase.instance.client;
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
   doLogin(String userName, String password) async{
     setErrorMsg("");
     setLoginStatus(false);
@@ -61,6 +71,68 @@ class LoginViewModel extends ChangeNotifier{
     }else if (res is Failed){
       setErrorMsg(res.failedReason as String);
       setLoginStatus(false);
+    }
+    setLoading(false);
+  }
+
+  Future<void> doGoogleLogin() async {
+    setErrorMsg("");
+    setLoginStatus(false);
+    if (!isSupabaseConfigured) {
+      setErrorMsg("Google SSO not configured");
+      return;
+    }
+    setLoading(true);
+    try {
+      final supabase = Supabase.instance.client;
+      final redirected = await supabase.auth.signInWithOAuth(
+        Provider.google,
+        redirectTo: Uri.base.origin,
+      );
+      if (!redirected) {
+        setErrorMsg("Google sign-in was cancelled");
+        setLoading(false);
+        return;
+      }
+      // After redirect, session should be available on next app load;
+      // for web, poll briefly for session.
+      for (int i = 0; i < 10; i++) {
+        await Future.delayed(const Duration(milliseconds: 500));
+        final session = supabase.auth.currentSession;
+        if (session?.accessToken != null) {
+          final res = await LoginServices.supabaseLogin(session!.accessToken);
+          if (res is Success) {
+            final data = res.response as LoginResponseModel;
+            _storeData(data);
+            setLoginStatus(data.isSuccess);
+          } else if (res is Failed) {
+            setErrorMsg(res.failedReason as String);
+            setLoginStatus(false);
+          }
+          setLoading(false);
+          return;
+        }
+      }
+      // Fallback: listen for auth change
+      final sub = supabase.auth.onAuthStateChange.listen((data) async {
+        final session = data.session;
+        if (session?.accessToken != null) {
+          final res = await LoginServices.supabaseLogin(session!.accessToken);
+          if (res is Success) {
+            final d = res.response as LoginResponseModel;
+            _storeData(d);
+            setLoginStatus(d.isSuccess);
+          } else if (res is Failed) {
+            setErrorMsg(res.failedReason as String);
+          }
+          setLoading(false);
+        }
+      });
+      await Future.delayed(const Duration(seconds: 5));
+      await sub.cancel();
+      if (!isLoginSuccess) setErrorMsg("Google sign-in timed out. Please try again.");
+    } catch (e) {
+      setErrorMsg(e.toString());
     }
     setLoading(false);
   }

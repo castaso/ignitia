@@ -2,6 +2,7 @@
 
 Wire contract (Flutter client):
   POST /api/Login                  body {email, password}
+  POST /api/Login/supabase         body {accessToken}  (Google via Supabase)
   POST /api/Login/ChangePassword   body {email, oldPassword, newPassword}
   POST /api/Login/ForgetPassword   query ?email=
 
@@ -40,6 +41,7 @@ from ..security import (
     hash_password,
     hash_reset_token,
     verify_password,
+    verify_supabase_token,
 )
 
 logger = logging.getLogger("ignitia")
@@ -51,6 +53,12 @@ class ResetPasswordRequest(BaseModel):
     email: str
     token: str
     newPassword: str
+
+    model_config = ConfigDict(extra="ignore")
+
+
+class SupabaseLoginRequest(BaseModel):
+    accessToken: str
 
     model_config = ConfigDict(extra="ignore")
 
@@ -67,6 +75,29 @@ def login(payload: LoginRequest, db: Session = Depends(get_db)):
         return JSONResponse(status_code=401, content=fail("Your account is inactive"))
     token = create_token(employee.id)
     return ok(data=employee_json(employee), message=token)
+
+
+@router.post("/Login/supabase")
+def login_via_supabase(payload: SupabaseLoginRequest, db: Session = Depends(get_db)):
+    if not settings.SUPABASE_URL or not settings.SUPABASE_JWT_SECRET:
+        return JSONResponse(status_code=503, content=fail("Google SSO not configured"))
+    token = (payload.accessToken or "").strip()
+    if not token:
+        return JSONResponse(status_code=401, content=fail("Missing Supabase token"))
+    try:
+        email = verify_supabase_token(token)
+    except Exception as e:
+        msg = str(e)
+        if "expired" in msg.lower():
+            return JSONResponse(status_code=401, content=fail("Supabase session expired. Please sign in again"))
+        return JSONResponse(status_code=401, content=fail("Invalid Supabase token"))
+    employee = db.query(Employee).filter(Employee.email == email).first()
+    if employee is None:
+        return JSONResponse(status_code=404, content=fail("Account not found"))
+    if employee.status_id != 1:
+        return JSONResponse(status_code=401, content=fail("Your account is inactive"))
+    app_jwt = create_token(employee.id)
+    return ok(data=employee_json(employee), message=app_jwt)
 
 
 @router.post("/Login/ChangePassword")

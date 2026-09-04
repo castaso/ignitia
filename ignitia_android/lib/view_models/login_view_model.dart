@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:i_employment/config/office_location_config.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:i_employment/models/security/change_password_request_model.dart';
 import 'package:i_employment/repo/login_services.dart';
 import 'package:i_employment/repo/api_status.dart';
@@ -53,6 +54,10 @@ class LoginViewModel extends ChangeNotifier{
     notifyListeners();
   }
 
+  bool get isSupabaseConfigured {
+    try { Supabase.instance.client; return true; } catch (_) { return false; }
+  }
+
   doLogin(String userName, String password) async{
     setErrorMsg("");
     setLoginStatus(false);
@@ -72,6 +77,30 @@ class LoginViewModel extends ChangeNotifier{
       setErrorMsg(res.failedReason as String);
       setLoginStatus(false);
     }
+    setLoading(false);
+  }
+
+  Future<void> doGoogleLogin() async {
+    setErrorMsg("");
+    setLoginStatus(false);
+    if (!isSupabaseConfigured) { setErrorMsg("Google SSO not configured"); return; }
+    setLoading(true);
+    try {
+      final supabase = Supabase.instance.client;
+      final ok = await supabase.auth.signInWithOAuth(Provider.google, redirectTo: 'com.naas.i_employment://login-callback');
+      if (!ok) { setErrorMsg("Google sign-in was cancelled"); setLoading(false); return; }
+      final sub = supabase.auth.onAuthStateChange.listen((data) async {
+        final session = data.session;
+        if (session?.accessToken != null) {
+          final res = await LoginServices.supabaseLogin(session!.accessToken);
+          if (res is Success) { final d = res.response as LoginResponseModel; _storeData(d); setLoginStatus(d.isSuccess); if(!kIsWeb){ NotificationService().initNotification(); BackgroundService().initializeService(); } } else if (res is Failed) { setErrorMsg(res.failedReason as String); }
+          setLoading(false);
+        }
+      });
+      await Future.delayed(const Duration(seconds: 5));
+      await sub.cancel();
+      if (!isLoginSuccess) setErrorMsg("Google sign-in timed out. Please try again.");
+    } catch (e) { setErrorMsg(e.toString()); }
     setLoading(false);
   }
 

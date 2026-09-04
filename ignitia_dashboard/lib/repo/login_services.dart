@@ -27,6 +27,20 @@ class LoginServices {
     }
   }
 
+  static Future<Object> supabaseLogin(String accessToken) async {
+    try {
+      ApiService apiService = ApiService(dio.Dio());
+      LoginResponseModel response =
+          await apiService.loginWithSupabase({"accessToken": accessToken});
+      if (response.isSuccess) return Success(response: response);
+      return Failed(code: 103, failedReason: response.message);
+    } on dio.DioError catch (obj) {
+      return ApiError.getApiErrorMessage(obj);
+    } catch (e) {
+      return Failed(code: 103, failedReason: e.toString());
+    }
+  }
+
   static Future<Object> forgetPassword(String email) async {
     try {
       ApiService apiService = ApiService(dio.Dio());

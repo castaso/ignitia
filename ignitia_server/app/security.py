@@ -90,6 +90,25 @@ def decode_token(token: str):
         return None
 
 
+def verify_supabase_token(token: str) -> str:
+    """Verify a Supabase access token (HS256, SUPABASE_JWT_SECRET) and return
+    the lower-cased email. Raises ValueError on any failure (bad sig, expired,
+    missing email, wrong aud)."""
+    if not settings.SUPABASE_JWT_SECRET:
+        raise ValueError("Supabase SSO not configured")
+    payload = jwt.decode(
+        token,
+        settings.SUPABASE_JWT_SECRET,
+        algorithms=["HS256"],
+        audience="authenticated",
+        options={"require": ["exp", "email"]},
+    )
+    email = (payload.get("email") or "").strip().lower()
+    if not email:
+        raise ValueError("Supabase token missing email")
+    return email
+
+
 # ---------------------------------------------------------------------------
 # Password reset tokens (email-based)
 # ---------------------------------------------------------------------------

@@ -23,6 +23,7 @@ import 'package:i_employment/views/login_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:network_info_plus/network_info_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -81,12 +82,23 @@ Future<String?> _getLocationPermission() async {
   }
 }
 
+const String supabaseUrl = String.fromEnvironment('SUPABASE_URL');
+const String supabaseAnonKey = String.fromEnvironment('SUPABASE_ANON_KEY');
+
+Future<void> _initSupabase() async {
+  if (supabaseUrl.isEmpty || supabaseAnonKey.isEmpty) return;
+  try {
+    await Supabase.initialize(url: supabaseUrl, anonKey: supabaseAnonKey);
+  } catch (_) {}
+}
+
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
   if(!kIsWeb) {
     await _getLocationPermission();
   }
   _enablePlatformOverrideForDesktop();
+  await _initSupabase();
   //await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   // Set the background messaging handler early on, as a named top-level function
   //FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);

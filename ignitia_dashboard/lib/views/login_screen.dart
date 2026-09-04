@@ -124,6 +124,30 @@ class _LoginScreen extends State<LoginScreen> {
                         text: Strings.btnTextLogin,
                       ),
                     ),
+                    const SizedBox(height: 8),
+                    Container(
+                      padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                      child: Row(children: const [
+                        Expanded(child: Divider()),
+                        Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 12),
+                            child: Text("OR", style: TextStyle(color: Colors.grey))),
+                        Expanded(child: Divider()),
+                      ]),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.fromLTRB(10, 12, 10, 0),
+                      child: OutlinedButton.icon(
+                        onPressed: viewModel.loading
+                            ? null
+                            : () => viewModel.doGoogleLogin(),
+                        icon: const Icon(Icons.g_mobiledata, size: 24),
+                        label: const Text("Sign in with Google"),
+                        style: OutlinedButton.styleFrom(
+                          minimumSize: const Size.fromHeight(48),
+                        ),
+                      ),
+                    ),
                     Container(
                         alignment: Alignment.centerLeft,
                         child: Padding(

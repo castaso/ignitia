@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ignitia_dashboard/utils/colors.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:ignitia_dashboard/utils/global_fields.dart';
 import 'package:ignitia_dashboard/utils/shared_preference.dart';
 import 'package:ignitia_dashboard/utils/string.dart';
@@ -25,8 +26,19 @@ Future<void> _loadUserData() async {
   FieldValue.token = await SessionManager.getToken();
 }
 
+const String supabaseUrl = String.fromEnvironment('SUPABASE_URL');
+const String supabaseAnonKey = String.fromEnvironment('SUPABASE_ANON_KEY');
+
+Future<void> _initSupabase() async {
+  if (supabaseUrl.isEmpty || supabaseAnonKey.isEmpty) return;
+  try {
+    await Supabase.initialize(url: supabaseUrl, anonKey: supabaseAnonKey);
+  } catch (_) {}
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await _initSupabase();
   var loginStatus = await SessionManager.isUserLoggedIn();
   if (loginStatus) {
     await _loadUserData();

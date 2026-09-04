@@ -73,6 +73,12 @@ class Settings:
 
     DATABASE_URL = _env("DATABASE_URL", "sqlite:///./ignitia.db")
 
+    # Supabase Google SSO (shared project for web + Android).
+    # Empty → SSO disabled (POST /Login/supabase returns 503).
+    # Set these from Supabase Dashboard → Project Settings → API.
+    SUPABASE_URL = _env("SUPABASE_URL", "")
+    SUPABASE_JWT_SECRET = _env("SUPABASE_JWT_SECRET", "")
+
     # Approval status ids (convention used by the Flutter client).
     APPROVAL_PENDING = 1
     APPROVAL_APPROVED = 2
