@@ -42,7 +42,8 @@ If defines are missing, the “Sign in with Google” button shows *Google SSO n
 ## 7) Verify
 - Unknown Google email → 404 `Account not found` (no auto-provision, per spec).
 - Inactive employee → 401.
-- Valid Google user whose email exists in `employees` → returns app JWT, same session as email login.
+- Valid Google user whose email exists in `employees.email` or `employee_contact_info.personal_email` → returns app JWT, same session as email login.
+- `castasoft@gmail.com` is seeded as an admin so Google SSO for that account succeeds.
 
 ## Env summary
 | Place | Vars | Source |

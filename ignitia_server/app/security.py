@@ -90,6 +90,17 @@ def decode_token(token: str):
         return None
 
 
+def _email_from_supabase_payload(payload: dict) -> str:
+    """Google SSO tokens may put email at the top level or under user_metadata."""
+    nested = payload.get("user_metadata") or payload.get("app_metadata") or {}
+    if not isinstance(nested, dict):
+        nested = {}
+    for raw in (payload.get("email"), nested.get("email")):
+        if isinstance(raw, str) and raw.strip():
+            return raw.strip().lower()
+    return ""
+
+
 def verify_supabase_token(token: str) -> str:
     """Verify a Supabase access token (HS256, SUPABASE_JWT_SECRET) and return
     the lower-cased email. Raises ValueError on any failure (bad sig, expired,
@@ -101,9 +112,9 @@ def verify_supabase_token(token: str) -> str:
         settings.SUPABASE_JWT_SECRET,
         algorithms=["HS256"],
         audience="authenticated",
-        options={"require": ["exp", "email"]},
+        options={"require": ["exp"]},
     )
-    email = (payload.get("email") or "").strip().lower()
+    email = _email_from_supabase_payload(payload)
     if not email:
         raise ValueError("Supabase token missing email")
     return email

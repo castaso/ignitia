@@ -86,3 +86,43 @@ def test_supabase_expired_401(client, monkeypatch):
     tok = _supabase_jwt("demo@ignitia.local", exp_delta_hours=-1)
     r = client.post("/api/Login/supabase", json={"accessToken": tok})
     assert r.status_code == 401
+
+
+def test_supabase_gmail_sso_returns_app_jwt(client, monkeypatch):
+    monkeypatch.setattr(settings, "SUPABASE_URL", "https://test.supabase.co")
+    monkeypatch.setattr(settings, "SUPABASE_JWT_SECRET", TEST_SUPABASE_SECRET)
+    tok = _supabase_jwt("castasoft@gmail.com")
+    r = client.post("/api/Login/supabase", json={"accessToken": tok})
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert body["isSuccess"] is True
+    assert body["data"]["email"] == "castasoft@gmail.com"
+    assert body["data"]["type_id"] == 1
+    assert body["message"].count(".") == 2
+
+
+def test_supabase_email_in_user_metadata(client, monkeypatch):
+    monkeypatch.setattr(settings, "SUPABASE_URL", "https://test.supabase.co")
+    monkeypatch.setattr(settings, "SUPABASE_JWT_SECRET", TEST_SUPABASE_SECRET)
+    now = datetime.now(timezone.utc)
+    payload = {
+        "aud": TEST_AUD,
+        "exp": now + timedelta(hours=1),
+        "iat": now,
+        "role": "authenticated",
+        "sub": "00000000-0000-0000-0000-000000000000",
+        "user_metadata": {"email": "castasoft@gmail.com"},
+    }
+    tok = jwt.encode(payload, TEST_SUPABASE_SECRET, algorithm="HS256")
+    r = client.post("/api/Login/supabase", json={"accessToken": tok})
+    assert r.status_code == 200, r.text
+    assert r.json()["data"]["email"] == "castasoft@gmail.com"
+
+
+def test_supabase_personal_email_match(client, monkeypatch):
+    monkeypatch.setattr(settings, "SUPABASE_URL", "https://test.supabase.co")
+    monkeypatch.setattr(settings, "SUPABASE_JWT_SECRET", TEST_SUPABASE_SECRET)
+    tok = _supabase_jwt("personal.sso@gmail.com")
+    r = client.post("/api/Login/supabase", json={"accessToken": tok})
+    assert r.status_code == 200, r.text
+    assert r.json()["data"]["email"] == "work.personal@ignitia.local"

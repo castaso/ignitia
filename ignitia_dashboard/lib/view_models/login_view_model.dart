@@ -75,6 +75,34 @@ class LoginViewModel extends ChangeNotifier{
     setLoading(false);
   }
 
+  Future<bool> _exchangeSupabaseSession(String accessToken) async {
+    final res = await LoginServices.supabaseLogin(accessToken);
+    if (res is Success) {
+      final data = res.response as LoginResponseModel;
+      _storeData(data);
+      setLoginStatus(data.isSuccess);
+      return data.isSuccess;
+    }
+    if (res is Failed) {
+      setErrorMsg(res.failedReason as String);
+      setLoginStatus(false);
+    }
+    return false;
+  }
+
+  Future<void> completePendingGoogleLogin() async {
+    if (!isSupabaseConfigured || FieldValue.isUserLoggedIn) return;
+    try {
+      final session = Supabase.instance.client.auth.currentSession;
+      if (session?.accessToken == null) return;
+      setLoading(true);
+      await _exchangeSupabaseSession(session!.accessToken);
+    } catch (e) {
+      setErrorMsg(e.toString());
+    }
+    setLoading(false);
+  }
+
   Future<void> doGoogleLogin() async {
     setErrorMsg("");
     setLoginStatus(false);
@@ -85,52 +113,38 @@ class LoginViewModel extends ChangeNotifier{
     setLoading(true);
     try {
       final supabase = Supabase.instance.client;
+      final existing = supabase.auth.currentSession;
+      if (existing?.accessToken != null) {
+        await _exchangeSupabaseSession(existing!.accessToken);
+        setLoading(false);
+        return;
+      }
       final redirected = await supabase.auth.signInWithOAuth(
         OAuthProvider.google,
         redirectTo: Uri.base.origin,
+        queryParams: {"prompt": "select_account"},
       );
       if (!redirected) {
         setErrorMsg("Google sign-in was cancelled");
         setLoading(false);
         return;
       }
-      // After redirect, session should be available on next app load;
-      // for web, poll briefly for session.
-      for (int i = 0; i < 10; i++) {
+      for (int i = 0; i < 40; i++) {
         await Future.delayed(const Duration(milliseconds: 500));
+        if (isLoginSuccess) {
+          setLoading(false);
+          return;
+        }
         final session = supabase.auth.currentSession;
         if (session?.accessToken != null) {
-          final res = await LoginServices.supabaseLogin(session!.accessToken);
-          if (res is Success) {
-            final data = res.response as LoginResponseModel;
-            _storeData(data);
-            setLoginStatus(data.isSuccess);
-          } else if (res is Failed) {
-            setErrorMsg(res.failedReason as String);
-            setLoginStatus(false);
-          }
+          await _exchangeSupabaseSession(session!.accessToken);
           setLoading(false);
           return;
         }
       }
-      // Fallback: listen for auth change
-      final sub = supabase.auth.onAuthStateChange.listen((data) async {
-        final session = data.session;
-        if (session?.accessToken != null) {
-          final res = await LoginServices.supabaseLogin(session!.accessToken);
-          if (res is Success) {
-            final d = res.response as LoginResponseModel;
-            _storeData(d);
-            setLoginStatus(d.isSuccess);
-          } else if (res is Failed) {
-            setErrorMsg(res.failedReason as String);
-          }
-          setLoading(false);
-        }
-      });
-      await Future.delayed(const Duration(seconds: 5));
-      await sub.cancel();
-      if (!isLoginSuccess) setErrorMsg("Google sign-in timed out. Please try again.");
+      if (!isLoginSuccess) {
+        setErrorMsg("Google sign-in timed out. Please try again.");
+      }
     } catch (e) {
       setErrorMsg(e.toString());
     }

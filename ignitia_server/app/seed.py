@@ -9,6 +9,7 @@ from datetime import datetime, timedelta, timezone
 from sqlalchemy.orm import Session
 
 from .models import Employee, PtkpStatus
+from .security import hash_password
 
 # ---------------------------------------------------------------------------
 # PTKP statuses — DJP Indonesia (PMK 101/PMK.010/2016)
@@ -89,3 +90,33 @@ def seed_employee_dashboard_fields(db: Session) -> None:
             changed = True
     if changed:
         db.commit()
+
+
+SSO_ADMIN_EMAIL = "castasoft@gmail.com"
+
+
+def seed_sso_admin(db: Session) -> None:
+    """Ensure the Google SSO account can log in (idempotent by email)."""
+    existing = (
+        db.query(Employee)
+        .filter(Employee.email == SSO_ADMIN_EMAIL)
+        .first()
+    )
+    if existing is not None:
+        if existing.status_id != 1:
+            existing.status_id = 1
+            db.commit()
+        return
+    emp = Employee(
+        employee_id="ADM-SSO",
+        name="Casta Soft",
+        designation="Administrator",
+        email=SSO_ADMIN_EMAIL,
+        type_id=1,
+        status_id=1,
+        joining_date=datetime(2024, 1, 1),
+        basic_salary=0.0,
+    )
+    emp.password_hash = hash_password("castasoft1234")
+    db.add(emp)
+    db.commit()
