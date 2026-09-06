@@ -1,5 +1,6 @@
 """Supabase SSO — POST /api/Login/supabase"""
 import jwt
+from cryptography.hazmat.primitives.asymmetric import ec
 from datetime import datetime, timedelta, timezone
 
 from app.config import settings
@@ -126,3 +127,68 @@ def test_supabase_personal_email_match(client, monkeypatch):
     r = client.post("/api/Login/supabase", json={"accessToken": tok})
     assert r.status_code == 200, r.text
     assert r.json()["data"]["email"] == "work.personal@ignitia.local"
+
+
+class _StubJWK:
+    def __init__(self, key):
+        self.key = key
+
+
+class _StubJWKSClient:
+    def __init__(self, key):
+        self._key = key
+
+    def get_signing_key_from_jwt(self, token):
+        return _StubJWK(self._key)
+
+
+def test_supabase_es256_signing_keys(client, monkeypatch):
+    """Newer Supabase projects sign tokens with asymmetric keys published
+    via JWKS; HS256 with the legacy secret no longer applies."""
+    import app.security as security
+
+    monkeypatch.setattr(settings, "SUPABASE_URL", "https://test.supabase.co")
+    monkeypatch.setattr(settings, "SUPABASE_JWT_SECRET", TEST_SUPABASE_SECRET)
+
+    private_key = ec.generate_private_key(ec.SECP256R1())
+    stub = _StubJWKSClient(private_key.public_key())
+    monkeypatch.setattr(security, "_supabase_jwks_client", lambda: stub)
+
+    now = datetime.now(timezone.utc)
+    payload = {
+        "aud": TEST_AUD,
+        "exp": now + timedelta(hours=1),
+        "iat": now,
+        "email": "castasoft@gmail.com",
+        "role": "authenticated",
+        "sub": "00000000-0000-0000-0000-000000000000",
+    }
+    tok = jwt.encode(payload, private_key, algorithm="ES256")
+    r = client.post("/api/Login/supabase", json={"accessToken": tok})
+    assert r.status_code == 200, r.text
+    assert r.json()["data"]["email"] == "castasoft@gmail.com"
+    assert r.json()["data"]["type_id"] == 1
+
+
+def test_supabase_es256_expired_401(client, monkeypatch):
+    import app.security as security
+
+    monkeypatch.setattr(settings, "SUPABASE_URL", "https://test.supabase.co")
+    monkeypatch.setattr(settings, "SUPABASE_JWT_SECRET", TEST_SUPABASE_SECRET)
+
+    private_key = ec.generate_private_key(ec.SECP256R1())
+    stub = _StubJWKSClient(private_key.public_key())
+    monkeypatch.setattr(security, "_supabase_jwks_client", lambda: stub)
+
+    now = datetime.now(timezone.utc)
+    payload = {
+        "aud": TEST_AUD,
+        "exp": now - timedelta(hours=1),
+        "iat": now - timedelta(hours=2),
+        "email": "castasoft@gmail.com",
+        "role": "authenticated",
+        "sub": "00000000-0000-0000-0000-000000000000",
+    }
+    tok = jwt.encode(payload, private_key, algorithm="ES256")
+    r = client.post("/api/Login/supabase", json={"accessToken": tok})
+    assert r.status_code == 401

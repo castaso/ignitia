@@ -101,19 +101,59 @@ def _email_from_supabase_payload(payload: dict) -> str:
     return ""
 
 
+@functools.lru_cache(maxsize=1)
+def _supabase_jwks_client() -> jwt.PyJWKClient | None:
+    """JWKS client for Supabase projects using the newer asymmetric
+    signing keys (ES256). Returns None when SUPABASE_URL is unset."""
+    if not settings.SUPABASE_URL:
+        return None
+    return jwt.PyJWKClient(
+        f"{settings.SUPABASE_URL.rstrip('/')}/auth/v1/.well-known/jwks.json"
+    )
+
+
+def _verify_supabase_token_jwks(token: str) -> dict:
+    """Verify via the project's published signing keys (ES256)."""
+    client = _supabase_jwks_client()
+    if client is None:
+        raise ValueError("Invalid Supabase token")
+    try:
+        signing_key = client.get_signing_key_from_jwt(token)
+        return jwt.decode(
+            token,
+            signing_key.key,
+            algorithms=["ES256"],
+            audience="authenticated",
+            options={"require": ["exp"]},
+        )
+    except jwt.ExpiredSignatureError:
+        raise
+    except Exception as e:
+        raise ValueError(f"Invalid Supabase token: {e}")
+
+
 def verify_supabase_token(token: str) -> str:
-    """Verify a Supabase access token (HS256, SUPABASE_JWT_SECRET) and return
-    the lower-cased email. Raises ValueError on any failure (bad sig, expired,
-    missing email, wrong aud)."""
+    """Verify a Supabase access token and return the lower-cased email.
+
+    Tries the legacy symmetric signature first (HS256 signed with
+    SUPABASE_JWT_SECRET); when that fails it falls back to the project's
+    asymmetric signing keys (ES256, published via the JWKS endpoint).
+    Raises ValueError on any failure (bad sig, expired, missing email,
+    wrong aud)."""
     if not settings.SUPABASE_JWT_SECRET:
         raise ValueError("Supabase SSO not configured")
-    payload = jwt.decode(
-        token,
-        settings.SUPABASE_JWT_SECRET,
-        algorithms=["HS256"],
-        audience="authenticated",
-        options={"require": ["exp"]},
-    )
+    try:
+        payload = jwt.decode(
+            token,
+            settings.SUPABASE_JWT_SECRET,
+            algorithms=["HS256"],
+            audience="authenticated",
+            options={"require": ["exp"]},
+        )
+    except jwt.ExpiredSignatureError:
+        raise
+    except Exception:
+        payload = _verify_supabase_token_jwks(token)
     email = _email_from_supabase_payload(payload)
     if not email:
         raise ValueError("Supabase token missing email")
