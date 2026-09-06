@@ -1,0 +1,1 @@
+start the server (python run.py in ignitia_server), then flutter run -d chrome --dart-define=API_BASE_URL=http://localhost:86/api/ in ignitia_dashboard and log in.
