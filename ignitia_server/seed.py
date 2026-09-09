@@ -73,6 +73,21 @@ def main() -> None:
         admin.reference_face = make_demo_face("admin-reference")
         db.add(admin)
 
+    if db.query(Employee).filter(Employee.email == "castasoft@gmail.com").first() is None:
+        sso_admin = Employee(
+            employee_id="ADM-SSO",
+            name="Casta Soft",
+            designation="Administrator",
+            email="castasoft@gmail.com",
+            type_id=1,
+            status_id=1,
+            joining_date=datetime(2024, 1, 1),
+            basic_salary=0.0,
+        )
+        sso_admin.password_hash = hash_password("castasoft1234")
+        sso_admin.reference_face = make_demo_face("sso-reference")
+        db.add(sso_admin)
+
     if db.query(Company).count() == 0:
         db.add(
             Company(
@@ -98,7 +113,10 @@ def main() -> None:
 
     db.commit()
     db.close()
-    print("Seeded. Logins -> demo@ignitia.local / demo1234, admin@ignitia.local / admin1234")
+    print(
+        "Seeded. Logins -> demo@ignitia.local / demo1234, "
+        "admin@ignitia.local / admin1234, castasoft@gmail.com (Google SSO)"
+    )
 
 
 if __name__ == "__main__":

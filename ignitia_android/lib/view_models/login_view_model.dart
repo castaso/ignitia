@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:i_employment/config/office_location_config.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:i_employment/models/security/change_password_request_model.dart';
 import 'package:i_employment/repo/login_services.dart';
 import 'package:i_employment/repo/api_status.dart';
@@ -80,27 +81,84 @@ class LoginViewModel extends ChangeNotifier{
     setLoading(false);
   }
 
+  Future<bool> _exchangeSupabaseSession(String accessToken) async {
+    final res = await LoginServices.supabaseLogin(accessToken);
+    if (res is Success) {
+      final data = res.response as LoginResponseModel;
+      _storeData(data);
+      setLoginStatus(data.isSuccess);
+      if (data.isSuccess && !kIsWeb) {
+        NotificationService().initNotification();
+        BackgroundService().initializeService();
+      }
+      return data.isSuccess;
+    }
+    if (res is Failed) {
+      setErrorMsg(res.failedReason as String);
+      setLoginStatus(false);
+    }
+    return false;
+  }
+
+  Future<void> completePendingGoogleLogin() async {
+    if (!isSupabaseConfigured || FieldValue.isUserLoggedIn) return;
+    try {
+      final session = Supabase.instance.client.auth.currentSession;
+      if (session?.accessToken == null) return;
+      setLoading(true);
+      await _exchangeSupabaseSession(session!.accessToken);
+    } catch (e) {
+      setErrorMsg(e.toString());
+    }
+    setLoading(false);
+  }
+
   Future<void> doGoogleLogin() async {
     setErrorMsg("");
     setLoginStatus(false);
-    if (!isSupabaseConfigured) { setErrorMsg("Google SSO not configured"); return; }
+    if (!isSupabaseConfigured) {
+      setErrorMsg("Google SSO not configured");
+      return;
+    }
     setLoading(true);
     try {
       final supabase = Supabase.instance.client;
-      final ok = await supabase.auth.signInWithOAuth(OAuthProvider.google, redirectTo: 'com.naas.i_employment://login-callback');
-      if (!ok) { setErrorMsg("Google sign-in was cancelled"); setLoading(false); return; }
-      final sub = supabase.auth.onAuthStateChange.listen((data) async {
-        final session = data.session;
-        if (session?.accessToken != null) {
-          final res = await LoginServices.supabaseLogin(session!.accessToken);
-          if (res is Success) { final d = res.response as LoginResponseModel; _storeData(d); setLoginStatus(d.isSuccess); if(!kIsWeb){ NotificationService().initNotification(); BackgroundService().initializeService(); } } else if (res is Failed) { setErrorMsg(res.failedReason as String); }
+      final existing = supabase.auth.currentSession;
+      if (existing?.accessToken != null) {
+        await _exchangeSupabaseSession(existing!.accessToken);
+        setLoading(false);
+        return;
+      }
+      final ok = await supabase.auth.signInWithOAuth(
+        OAuthProvider.google,
+        redirectTo: 'com.naas.i_employment://login-callback',
+        authScreenLaunchMode: LaunchMode.externalApplication,
+        queryParams: {"prompt": "select_account"},
+      );
+      if (!ok) {
+        setErrorMsg("Google sign-in was cancelled");
+        setLoading(false);
+        return;
+      }
+      for (int i = 0; i < 40; i++) {
+        await Future.delayed(const Duration(milliseconds: 500));
+        if (isLoginSuccess) {
           setLoading(false);
+          return;
         }
-      });
-      await Future.delayed(const Duration(seconds: 5));
-      await sub.cancel();
-      if (!isLoginSuccess) setErrorMsg("Google sign-in timed out. Please try again.");
-    } catch (e) { setErrorMsg(e.toString()); }
+        final session = supabase.auth.currentSession;
+        if (session?.accessToken != null) {
+          await _exchangeSupabaseSession(session!.accessToken);
+          setLoading(false);
+          return;
+        }
+      }
+      if (!isLoginSuccess) {
+        setErrorMsg("Google sign-in timed out. Please try again.");
+      }
+    } catch (e) {
+      setErrorMsg(e.toString());
+    }
     setLoading(false);
   }
 

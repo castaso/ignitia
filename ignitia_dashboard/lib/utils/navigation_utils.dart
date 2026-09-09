@@ -3,6 +3,7 @@ import 'package:ignitia_dashboard/views/dashboard_home_screen.dart';
 import 'package:ignitia_dashboard/views/login_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 void openHomeUI(BuildContext context) async {
   Navigator.pushReplacement(
@@ -38,6 +39,9 @@ void openNewUI(BuildContext context, Widget pageName) async {
 }
 
 void logout(BuildContext context) async {
+  try {
+    await Supabase.instance.client.auth.signOut();
+  } catch (_) {}
   await SessionManager.clear();
   Navigator.pushAndRemoveUntil(
     context,

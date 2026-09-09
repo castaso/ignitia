@@ -22,12 +22,13 @@ from datetime import datetime, timedelta, timezone
 from fastapi import APIRouter, Depends, Query
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, ConfigDict
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from ..config import settings
 from ..database import get_db
 from ..email import send_email
-from ..models import Employee, PasswordResetToken
+from ..models import Employee, EmployeeContactInfo, PasswordResetToken
 from ..schemas import (
     ChangePasswordRequest,
     LoginRequest,
@@ -47,6 +48,25 @@ from ..security import (
 logger = logging.getLogger("ignitia")
 
 router = APIRouter()
+
+
+def _find_employee_by_email(db: Session, email: str) -> Employee | None:
+    """Match work email first, then personal_email from contact info."""
+    employee = (
+        db.query(Employee)
+        .filter(func.lower(Employee.email) == email)
+        .first()
+    )
+    if employee is not None:
+        return employee
+    contact = (
+        db.query(EmployeeContactInfo)
+        .filter(func.lower(EmployeeContactInfo.personal_email) == email)
+        .first()
+    )
+    if contact is None:
+        return None
+    return db.get(Employee, contact.id)
 
 
 class ResetPasswordRequest(BaseModel):
@@ -91,7 +111,7 @@ def login_via_supabase(payload: SupabaseLoginRequest, db: Session = Depends(get_
         if "expired" in msg.lower():
             return JSONResponse(status_code=401, content=fail("Supabase session expired. Please sign in again"))
         return JSONResponse(status_code=401, content=fail("Invalid Supabase token"))
-    employee = db.query(Employee).filter(Employee.email == email).first()
+    employee = _find_employee_by_email(db, email)
     if employee is None:
         return JSONResponse(status_code=404, content=fail("Account not found"))
     if employee.status_id != 1:

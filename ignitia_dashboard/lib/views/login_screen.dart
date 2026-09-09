@@ -37,6 +37,7 @@ class _LoginScreen extends State<LoginScreen> {
   void initialization() async {
     viewModel = Provider.of<LoginViewModel>(context, listen: false);
     _listenChangeFromViewModel();
+    await viewModel.completePendingGoogleLogin();
   }
 
   @override

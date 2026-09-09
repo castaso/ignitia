@@ -35,7 +35,7 @@ from .routers import (
     timesheet,
     work_schedule,
 )
-from .seed import seed_employee_dashboard_fields, seed_ptkp_statuses
+from .seed import seed_employee_dashboard_fields, seed_ptkp_statuses, seed_sso_admin
 
 
 @asynccontextmanager
@@ -49,6 +49,7 @@ async def lifespan(app: FastAPI):
     try:
         seed_ptkp_statuses(db)
         seed_employee_dashboard_fields(db)
+        seed_sso_admin(db)
     finally:
         db.close()
     yield

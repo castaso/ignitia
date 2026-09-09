@@ -6,6 +6,7 @@ import 'package:i_employment/views/home/home_screen.dart';
 import 'package:i_employment/views/login_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 void openHomeUI(BuildContext context) async{
   Navigator.pushReplacement(
@@ -41,7 +42,9 @@ void openNewUI(BuildContext context,Widget pageName) async{
 }
 
 void logout(BuildContext context) async{
-  //SessionManager.setUserLoggedIn(false);
+  try {
+    await Supabase.instance.client.auth.signOut();
+  } catch (_) {}
   SessionManager.clear();
   Navigator.pushAndRemoveUntil(
     context,

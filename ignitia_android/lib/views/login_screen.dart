@@ -130,6 +130,7 @@ class _LoginScreen extends State<LoginScreen> {
     //listenFCM();
     //getFCMToken();
     _listenChangeFromViewModel();
+    await viewModel.completePendingGoogleLogin();
   }
 
   @override

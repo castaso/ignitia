@@ -25,7 +25,7 @@ from datetime import datetime
 
 from app.database import Base, SessionLocal, engine
 from app.main import app
-from app.models import Employee, LeaveType
+from app.models import Employee, EmployeeContactInfo, LeaveType
 from app.security import hash_password
 
 
@@ -75,6 +75,38 @@ def _db():
         admin.password_hash = hash_password("admin1234")
         admin.reference_face = make_face()
         db.add(admin)
+        sso_admin = Employee(
+            employee_id="ADM-SSO",
+            name="Casta Soft",
+            designation="Administrator",
+            email="castasoft@gmail.com",
+            type_id=1,
+            status_id=1,
+            joining_date=datetime(2024, 1, 1),
+        )
+        sso_admin.password_hash = hash_password("castasoft1234")
+        sso_admin.reference_face = make_face()
+        db.add(sso_admin)
+        db.flush()
+        personal = Employee(
+            employee_id="EMP-PE",
+            name="Personal Email User",
+            designation="Engineer",
+            email="work.personal@ignitia.local",
+            type_id=2,
+            status_id=1,
+            joining_date=datetime(2024, 1, 1),
+        )
+        personal.password_hash = hash_password("demo1234")
+        personal.reference_face = make_face()
+        db.add(personal)
+        db.flush()
+        db.add(
+            EmployeeContactInfo(
+                id=personal.id,
+                personal_email="personal.sso@gmail.com",
+            )
+        )
         for name, short, count in (
             ("Casual Leave", "CL", 10),
             ("Sick Leave", "SL", 14),
